@@ -1243,7 +1243,6 @@ async def view_order_details(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(Command("staff"))
-@router.message(Command("admin543"))
 async def admin_panel_command(message: Message, state: FSMContext):
     if message.from_user.id != int(ADMIN_ID):
         await message.answer("Недостаточно прав!")
