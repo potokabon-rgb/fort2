@@ -264,7 +264,7 @@ async def send_log(user_id: int, username: str, action: str):
     try:
         user_mention = f"@{username}" if username else f"ID: `{user_id}`"
         log_text = (
-            f"Лог системы FikSik Pay\n\n"
+            f"Лог системы Fortuna Pay\n\n"
             f"Пользователь: {user_mention}\n"
             f"ID: `{user_id}`\n"
             f"Действие: {action}"
@@ -381,12 +381,12 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
         await send_log(user_id, username, "Запустил бота / Главное меню")
 
     menu_text = (
-        "FikSik Pay — Безопасный автоматизированный обмен\n\n"
-        "О сервисе: Мы осуществляем моментальный и полностью безопасный обмен ваших долларов и криптовалюты USDT на банковские карты и СБП.\n"
-        "• 100% гарантия безопасности сделок\n"
-        "• Лучшие курсы рынка\n"
-        "• Круглосуточная поддержка\n\n"
-        "Выберите нужный раздел в меню ниже:"
+        "Fortuna Pay — Безопасный автоматизированный обмен [💎](tg://emoji?id=5994378914636500516)\n\n"
+        "О сервисе: Мы осуществляем моментальный обмен ваших USDT [🪙](tg://emoji?id=5992430854909989581)\n"
+        "• [🛡](tg://emoji?id=5883964170268840032) 100% гарантия безопасности сделок\n"
+        "• [📈](tg://emoji?id=5931515758952583071) Лучшие курсы рынка\n"
+        "• [💬](tg://emoji?id=5778575233422200567) Круглосуточная поддержка\n\n"
+        "Выберите нужный раздел в меню ниже: [👇](tg://emoji?id=5935938364086685805)"
     )
 
     await edit_or_reply(event, menu_text, reply_markup=main_menu_kb(), state=state)
@@ -407,7 +407,7 @@ async def reviews_handler(callback: CallbackQuery, state: FSMContext):
     await send_log(user_id, callback.from_user.username, "Открыл отзывы")
 
     text = (
-        "Отзывы о сервисе FikSik Pay\n\n"
+        "Отзывы о сервисе Fortuna Pay\n\n"
         "Вы можете ознакомиться с реальными отзывами наших клиентов или оставить свой собственный отзыв сразу после завершения успешного обмена!"
     )
 
@@ -438,13 +438,13 @@ async def user_profile(callback: CallbackQuery, state: FSMContext):
     balance, total, completed, joined = res if res else (0.0, 0, 0, "Неизвестно")
 
     profile_text = (
-        f"Личный кабинет\n\n"
-        f"ID: `{user_id}`\n"
-        f"Юзернейм: @{username if username else 'отсутствует'}\n"
-        f"Регистрация: `{joined}`\n\n"
-        f"Статистика сделок:\n"
-        f"Баланс аккаунта: `{balance:.2f} USDT`\n"
-        f"Всего заявок: `{total}` (Успешно: `{completed}`)"
+        f"[👤](tg://emoji?id=5883964170268840032) Личный кабинет\n\n"
+        f"[🆔](tg://emoji?id=5994378914636500516) ID: `{user_id}`\n"
+        f"[💬](tg://emoji?id=5778575233422200567) Юзернейм: @{username if username else 'отсутствует'}\n"
+        f"[📅](tg://emoji?id=5967456680940671207) Регистрация: `{joined}`\n\n"
+        f"[📊](tg://emoji?id=5931515758952583071) Статистика сделок:\n"
+        f"[🪙](tg://emoji?id=5992430854909989581) Баланс аккаунта: `{balance:.2f} USDT`\n"
+        f"[📁](tg://emoji?id=5935938364086685805) Всего заявок: `{total}` (Успешно: `{completed}`)"
     )
 
     await edit_or_reply(callback, profile_text, reply_markup=menu_button_kb(), state=state)
@@ -530,12 +530,12 @@ async def sell_usdt_start(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        "Создание заявки на обмен\n\n"
-        "Действующие курсы:\n"
-        f"• До {lim1}$ ➔ `{r1} ₽`\n"
-        f"• {lim1}-{lim2}$ ➔ `{r2} ₽`\n"
-        f"• От {lim2}$ ➔ `{r3} ₽`\n\n"
-        "Отправьте сообщением сумму USDT, которую хотите обменять:"
+        f"[💎](tg://emoji?id=5994378914636500516) Создание заявки на обмен\n\n"
+        f"[📊](tg://emoji?id=5931515758952583071) Действующие курсы:\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • До {lim1}$ ➔ `{r1} ₽`\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • {lim1}-{lim2}$ ➔ `{r2} ₽`\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • От {lim2}$ ➔ `{r3} ₽`\n\n"
+        f"[🪙](tg://emoji?id=5992430854909989581) Отправьте сообщением сумму USDT, которую хотите обменять:"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
     await state.set_state(SellStates.waiting_for_amount)
@@ -759,13 +759,14 @@ async def process_sell_requisites(message: Message, state: FSMContext):
     builder.button(text="Взять заявку", callback_data=f"take_order_{order_id}", icon_custom_emoji_id="5906995262378741881")
 
     admin_text = (
-        f"НОВАЯ ЗАЯВКА #{order_id} ГОТОВА К ОБРАБОТКЕ!\n\n"
+        f"🔔 **НОВАЯ ЗАЯВКА #{order_id} ГОТОВА К ОБРАБОТКЕ!**\n\n"
         f"Пользователь: @{username} (`{user_id}`)\n"
         f"Сумма: `{amount_usdt} USDT` (`{amount_rub} ₽`){balance_note}\n"
         f"Реквизиты: `{raw_req}`\n"
         f"Чек: {check_link}"
     )
 
+    # Уведомление администратору о новой заявке
     try:
         await message.bot.send_message(
             chat_id=int(ADMIN_ID),
@@ -1045,7 +1046,7 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
     await edit_or_reply(
         callback,
         f"Сделка #{order_id} успешно завершена!\n\n"
-        f"Напишите короткий отзыв о работе сервиса FikSik Pay ниже:",
+        f"Напишите короткий отзыв о работе сервиса Fortuna Pay ниже:",
         reply_markup=builder.as_markup(),
         state=state
     )
@@ -1077,7 +1078,7 @@ async def process_user_review(message: Message, state: FSMContext):
     current_date = datetime.now().strftime("%d.%m.%Y %H:%M")
 
     formatted_review = (
-        f"Новый отзыв о FikSik Pay\n\n"
+        f"Новый отзыв о Fortuna Pay\n\n"
         f"От: {user_mention}\n"
         f"Дата: `{current_date}`\n\n"
         f"Комментарий:\n{review_text}"
@@ -1142,11 +1143,11 @@ async def exchange_rate_handler(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        f"Актуальные курсы обмена\n\n"
-        f"• До {lim1} USDT ➔ `{r1} ₽` за 1 USDT\n"
-        f"• От {lim1} до {lim2} USDT ➔ `{r2} ₽` за 1 USDT\n"
-        f"• От {lim2} USDT ➔ `{r3} ₽` за 1 USDT\n\n"
-        f"Расчет курса пересчитывается автоматически."
+        f"[📊](tg://emoji?id=5931515758952583071) Актуальные курсы обмена\n\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • До {lim1} USDT ➔ `{r1} ₽` за 1 USDT\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • От {lim1} до {lim2} USDT ➔ `{r2} ₽` за 1 USDT\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • От {lim2} USDT ➔ `{r3} ₽` за 1 USDT\n\n"
+        f"[ℹ️](tg://emoji?id=5935938364086685805) Расчет курса пересчитывается автоматически."
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
 
@@ -1225,6 +1226,7 @@ async def view_order_details(callback: CallbackQuery, state: FSMContext):
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
 
 
+@router.message(Command("admin"))
 @router.message(Command("admin543"))
 async def admin_panel_command(message: Message, state: FSMContext):
     if message.from_user.id != int(ADMIN_ID):
@@ -1264,7 +1266,7 @@ async def show_admin_menu(event: Message | CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        f"Панель управления сервисом FikSik Pay\n\n"
+        f"Панель управления сервисом Fortuna Pay\n\n"
         f"Всего пользователей: `{users_count}`\n"
         f"Новые заявки: `{pending_count}`\n"
         f"Активные заявки в работе: `{in_progress_count}`\n"
