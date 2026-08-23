@@ -368,11 +368,9 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
         cursor.execute("SELECT user_id, referrer_id FROM users WHERE user_id = ?", (user_id,))
         exists = cursor.fetchone()
         if not exists:
-            # Если пользователь новый и есть реферер, записываем его
             cursor.execute("INSERT INTO users (user_id, username, referrer_id) VALUES (?, ?, ?)",
                            (user_id, username, referrer_id))
         else:
-            # Если пользователь уже был, но реферер не был задан, а сейчас перешел по рефке — привязываем
             current_ref = exists[1]
             if not current_ref and referrer_id and referrer_id != user_id:
                 cursor.execute("UPDATE users SET referrer_id = ? WHERE user_id = ?", (referrer_id, user_id))
@@ -382,7 +380,7 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
         conn.close()
 
     if not await check_subscription(user_id):
-        text = f"Требуется подписка\n\nДля использования сервиса подпишитесь на официальный канал: `{REQUIRED_CHANNEL}`\n\nПосле подписки нажмите кнопку проверки ниже:"
+        text = f"[🔒](tg://emoji?id=5920090136627908485) **Требуется подписка**\n\nДля использования сервиса подпишитесь на официальный канал: `{REQUIRED_CHANNEL}`\n\nПосле подписки нажмите кнопку проверки ниже:"
         await edit_or_reply(event, text, reply_markup=sub_check_kb(), state=state)
         return
 
@@ -390,11 +388,11 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
         await send_log(user_id, username, "Запустил бота / Главное меню")
 
     menu_text = (
-        f"[💎](tg://emoji?id=5994378914636500516) Fortuna Pay — Безопасный автоматизированный обмен\n\n"
-        f"[🪙](tg://emoji?id=5992430854909989581) О сервисе: Мы осуществляем моментальный обмен ваших USDT\n"
-        f"[🛡](tg://emoji?id=5883964170268840032) • 100% гарантия безопасности сделок\n"
-        f"[📈](tg://emoji?id=5931515758952583071) • Лучшие курсы рынка\n"
-        f"[💬](tg://emoji?id=5778575233422200567) • Круглосуточная поддержка\n\n"
+        f"[💎](tg://emoji?id=5994378914636500516) **Fortuna Pay** — Безопасный автоматизированный обмен [✨](tg://emoji?id=5992430854909989581)\n\n"
+        f"[🪙](tg://emoji?id=5992430854909989581) О сервисе: Мы осуществляем моментальный обмен ваших USDT [🚀](tg://emoji?id=5935938364086685805)\n"
+        f"[🛡](tg://emoji?id=5883964170268840032) • 100% гарантия безопасности сделок [🔒](tg://emoji?id=5883964170268840032)\n"
+        f"[📈](tg://emoji?id=5931515758952583071) • Лучшие курсы рынка [🔥](tg://emoji?id=5994378914636500516)\n"
+        f"[💬](tg://emoji?id=5778575233422200567) • Круглосуточная поддержка [⭐️](tg://emoji?id=5958376256788502078)\n\n"
         f"[👇](tg://emoji?id=5935938364086685805) Выберите нужный раздел в меню ниже:"
     )
 
@@ -404,7 +402,7 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "check_sub")
 async def process_check_sub(callback: CallbackQuery, state: FSMContext):
     if await check_subscription(callback.from_user.id):
-        await edit_or_reply(callback, "Подписка подтверждена!\n\nГлавное меню:", reply_markup=main_menu_kb(),
+        await edit_or_reply(callback, "[✅](tg://emoji?id=5776375003280838798) Подписка подтверждена!\n\nГлавное меню:", reply_markup=main_menu_kb(),
                             state=state)
     else:
         await callback.answer("Вы всё еще не подписаны на канал!", show_alert=True)
@@ -416,8 +414,8 @@ async def reviews_handler(callback: CallbackQuery, state: FSMContext):
     await send_log(user_id, callback.from_user.username, "Открыл отзывы")
 
     text = (
-        "Отзывы о сервисе Fortuna Pay\n\n"
-        "Вы можете ознакомиться с реальными отзывами наших клиентов или оставить свой собственный отзыв сразу после завершения успешного обмена!"
+        "[⭐](tg://emoji?id=5958376256788502078) **Отзывы о сервисе Fortuna Pay** [💬](tg://emoji?id=5778575233422200567)\n\n"
+        "Вы можете ознакомиться с реальными отзывами наших клиентов или оставить свой собственный отзыв сразу после завершения успешного обмена! [🔥](tg://emoji?id=5994378914636500516)"
     )
 
     builder = InlineKeyboardBuilder()
@@ -448,13 +446,13 @@ async def user_profile(callback: CallbackQuery, state: FSMContext):
     balance, total, completed, joined = res if res else (0.0, 0, 0, "Неизвестно")
 
     profile_text = (
-        f"[👤](tg://emoji?id=5883964170268840032) Личный кабинет\n\n"
+        f"[👤](tg://emoji?id=5883964170268840032) **Личный кабинет** [✨](tg://emoji?id=5994378914636500516)\n\n"
         f"[🆔](tg://emoji?id=5994378914636500516) ID: `{user_id}`\n"
         f"[💬](tg://emoji?id=5778575233422200567) Юзернейм: @{username if username else 'отсутствует'}\n"
         f"[📅](tg://emoji?id=5967456680940671207) Регистрация: `{joined}`\n\n"
-        f"[📊](tg://emoji?id=5931515758952583071) Статистика сделок:\n"
-        f"[🪙](tg://emoji?id=5992430854909989581) Баланс аккаунта: `{balance:.2f} USDT`\n"
-        f"[📁](tg://emoji?id=5935938364086685805) Всего заявок: `{total}` (Успешно: `{completed}`)"
+        f"[📊](tg://emoji?id=5931515758952583071) **Статистика сделок:** [📈](tg://emoji?id=5931515758952583071)\n"
+        f"[🪙](tg://emoji?id=5992430854909989581) Баланс аккаунта: `{balance:.2f} USDT` [💎](tg://emoji?id=5994378914636500516)\n"
+        f"[📁](tg://emoji?id=5935938364086685805) Всего заявок: `{total}` (Успешно: `{completed}`) [🔥](tg://emoji?id=5992430854909989581)"
     )
 
     await edit_or_reply(callback, profile_text, reply_markup=menu_button_kb(), state=state)
@@ -475,10 +473,10 @@ async def referral_menu_handler(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     text = (
-        f"Реферальная система (3%)\n\n"
-        f"Приглашайте друзей и получайте **3%** от суммы их успешных обменов прямо на ваш баланс!\n\n"
-        f"Ваша реферальная ссылка:\n`{ref_link}`\n\n"
-        f"Приглашено пользователей: `{ref_count}`"
+        f"[🎁](tg://emoji?id=5877530150345641603) **Реферальная система (3%)** [💎](tg://emoji?id=5994378914636500516)\n\n"
+        f"Приглашайте друзей и получайте **3%** от суммы их успешных обменов прямо на ваш баланс! [🚀](tg://emoji?id=5935938364086685805)\n\n"
+        f"[🔗](tg://emoji?id=5931515758952583071) **Ваша реферальная ссылка:**\n`{ref_link}`\n\n"
+        f"[👥](tg://emoji?id=5883964170268840032) Приглашено пользователей: `{ref_count}` [🔥](tg://emoji?id=5992430854909989581)"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
 
@@ -493,12 +491,12 @@ async def calculator_start(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        "Калькулятор USDT ➔ RUB\n\n"
+        "[🧮](tg://emoji?id=5935938364086685805) **Калькулятор USDT ➔ RUB** [📊](tg://emoji?id=5931515758952583071)\n\n"
         "Действующие тарифные ставки:\n"
-        f"• До {lim1} USDT ➔ `{r1} ₽`\n"
-        f"• От {lim1} до {lim2} USDT ➔ `{r2} ₽`\n"
-        f"• От {lim2} USDT ➔ `{r3} ₽`\n\n"
-        "Отправляйте числа сообщением — сумма будет пересчитываться автоматически:"
+        f"[🔹](tg://emoji?id=5883964170268840032) • До {lim1} USDT ➔ `{r1} ₽`\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • От {lim1} до {lim2} USDT ➔ `{r2} ₽`\n"
+        f"[🔹](tg://emoji?id=5883964170268840032) • От {lim2} USDT ➔ `{r3} ₽`\n\n"
+        "[💬](tg://emoji?id=5778575233422200567) Отправляйте числа сообщением — сумма будет пересчитываться автоматически:"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
     await state.set_state(CalcStates.waiting_for_calc_amount)
@@ -519,11 +517,11 @@ async def calculator_process(message: Message, state: FSMContext):
     total_rub = round(amount * rate, 2)
 
     text = (
-        f"Результат расчета:\n\n"
+        f"[📈](tg://emoji?id=5931515758952583071) **Результат расчета:** [🪙](tg://emoji?id=5992430854909989581)\n\n"
         f"Сумма к обмену: `{amount} USDT`\n"
         f"Примененный курс: `{rate} ₽` / USDT\n"
-        f"Вы получите: {total_rub} ₽\n\n"
-        f"*Можете отправить другое число для мгновенного пересчета:* "
+        f"Вы получите: `{total_rub} ₽` [🔥](tg://emoji?id=5994378914636500516)\n\n"
+        f"*Можете отправить другое число для мгновенного пересчета:*"
     )
 
     await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
@@ -540,7 +538,7 @@ async def sell_usdt_start(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        f"[💎](tg://emoji?id=5994378914636500516) Создание заявки на обмен\n\n"
+        f"[💎](tg://emoji?id=5994378914636500516) **Создание заявки на обмен** [🚀](tg://emoji?id=5935938364086685805)\n\n"
         f"[📊](tg://emoji?id=5931515758952583071) Действующие курсы:\n"
         f"[🔹](tg://emoji?id=5883964170268840032) • До {lim1}$ ➔ `{r1} ₽`\n"
         f"[🔹](tg://emoji?id=5883964170268840032) • {lim1}-{lim2}$ ➔ `{r2} ₽`\n"
@@ -587,7 +585,7 @@ async def process_sell_amount(message: Message, state: FSMContext):
         builder.adjust(1)
 
         text = (
-            f"Обнаружен внутренний баланс: `{user_balance:.2f} USDT`\n\n"
+            f"[🪙](tg://emoji?id=5992430854909989581) Обнаружен внутренний баланс: `{user_balance:.2f} USDT`\n\n"
             f"Желаете ли вы использовать средства с баланса для частичной или полной оплаты заявки на `{amount} USDT`?"
         )
         await edit_or_reply(message, text, reply_markup=builder.as_markup(), state=state)
@@ -967,7 +965,6 @@ async def process_user_remainder_choice(callback: CallbackQuery, state: FSMConte
             cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (remainder_usdt, user_id))
             choice_text = f"Остаток `{remainder_usdt:.2f} USDT` успешно зачислен на ваш внутренний баланс!"
         else:
-            # Сохраняем информацию об оставленных на чай средствах (в USDT)
             cursor.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('total_tips_usdt', '0')")
             cursor.execute("UPDATE settings SET value = CAST(value AS REAL) + ? WHERE key = 'total_tips_usdt'",
                            (remainder_usdt,))
@@ -1161,7 +1158,7 @@ async def exchange_rate_handler(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        f"[📊](tg://emoji?id=5931515758952583071) Актуальные курсы обмена\n\n"
+        f"[📊](tg://emoji?id=5931515758952583071) **Актуальные курсы обмена** [🪙](tg://emoji?id=5992430854909989581)\n\n"
         f"[🔹](tg://emoji?id=5883964170268840032) • До {lim1} USDT ➔ `{r1} ₽` за 1 USDT\n"
         f"[🔹](tg://emoji?id=5883964170268840032) • От {lim1} до {lim2} USDT ➔ `{r2} ₽` за 1 USDT\n"
         f"[🔹](tg://emoji?id=5883964170268840032) • От {lim2} USDT ➔ `{r3} ₽` за 1 USDT\n\n"
@@ -1193,7 +1190,7 @@ async def history_handler(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     text = (
-        f"История ваших операций\n\n"
+        f"[📁](tg://emoji?id=5935938364086685805) **История ваших операций** [📊](tg://emoji?id=5931515758952583071)\n\n"
         f"Всего заявок: `{total_q}` | Завершено: `{completed_q}`\n\n"
         f"Последние действия:"
     )
@@ -1245,7 +1242,7 @@ async def view_order_details(callback: CallbackQuery, state: FSMContext):
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
 
 
-@router.message(Command("admin"))
+@router.message(Command("staff"))
 @router.message(Command("admin543"))
 async def admin_panel_command(message: Message, state: FSMContext):
     if message.from_user.id != int(ADMIN_ID):
@@ -1276,7 +1273,6 @@ async def show_admin_menu(event: Message | CallbackQuery, state: FSMContext):
         cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 'Завершено'")
         completed_count = cursor.fetchone()[0]
 
-        # Получаем общую сумму оставленных чаевых
         cursor.execute("SELECT value FROM settings WHERE key = 'total_tips_usdt'")
         tip_res = cursor.fetchone()
         total_tips = float(tip_res[0]) if tip_res else 0.0
@@ -1409,9 +1405,8 @@ async def adm_edit_balance_save(message: Message, state: FSMContext):
                          parse_mode="Markdown")
 
     try:
-        await bot.send_message(chat_id=target_id, text=ف
-        "Администратор обновил ваш баланс. Текущий баланс: `{new_balance:.2f} USDT`", parse_mode = "Markdown")
-        except Exception:
+        await bot.send_message(chat_id=target_id, text=f"Администратор обновил ваш баланс. Текущий баланс: `{new_balance:.2f} USDT`", parse_mode="Markdown")
+    except Exception:
         pass
 
     await show_admin_menu(message, state)
@@ -1726,7 +1721,6 @@ async def adm_export_users(callback: CallbackQuery):
     finally:
         conn.close()
 
-    # Красивая табличная верстка для выгрузки пользователей
     file_content = f"{'USER_ID':<15} | {'USERNAME':<20} | {'BALANCE':<12} | {'DEALS':<6}\n"
     file_content += "-" * 63 + "\n"
     for uid, uname, bal, deals in users:
@@ -1758,14 +1752,11 @@ async def adm_export_system_logs(callback: CallbackQuery):
     finally:
         conn.close()
 
-    # Красивая табличная верстка с фиксированной шириной столбцов для TXT логов
     file_content = f"{'ID':<6} | {'USER_ID':<15} | {'USERNAME':<18} | {'ACTION':<35} | {'TIME':<19}\n"
     file_content += "-" * 105 + "\n"
     for l_id, uid, uname, action, created in logs:
         uname_str = f"@{uname}" if uname else "none"
-        file_content += f
-        {f'#{l_id}': < 6} | {str(uid): < 15} | {uname_str: < 18} | {str(action): < 35} | {str(created): < 19}\n
-        "
+        file_content += f"{f'#{l_id}':<6} | {str(uid):<15} | {uname_str:<18} | {str(action):<35} | {str(created):<19}\n"
 
     filename = "system_logs_export.txt"
     with open(filename, "w", encoding="utf-8") as f:
