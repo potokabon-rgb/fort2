@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.types import Message, CallbackQuery, FSInputFile, ChatMemberOwner, ChatMemberAdministrator, \
-    ChatMemberMember
+    ChatMemberMember, ReactionTypeEmoji
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -402,7 +402,8 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "check_sub")
 async def process_check_sub(callback: CallbackQuery, state: FSMContext):
     if await check_subscription(callback.from_user.id):
-        await edit_or_reply(callback, "[✅](tg://emoji?id=5776375003280838798) Подписка подтверждена!\n\nГлавное меню:", reply_markup=main_menu_kb(),
+        await edit_or_reply(callback, "[✅](tg://emoji?id=5776375003280838798) Подписка подтверждена!\n\nГлавное меню:",
+                            reply_markup=main_menu_kb(),
                             state=state)
     else:
         await callback.answer("Вы всё еще не подписаны на канал!", show_alert=True)
@@ -1091,8 +1092,9 @@ async def process_user_review(message: Message, state: FSMContext):
     user_mention = f"@{username}" if username else f"ID: `{user_id}`"
     current_date = datetime.now().strftime("%d.%m.%Y %H:%M")
 
+    # Добавлены премиум-эмодзи в текст отзыва для канала
     formatted_review = (
-        f"Новый отзыв о Fortuna Pay\n\n"
+        f"[⭐](tg://emoji?id=5958376256788502078) **Новый отзыв о Fortuna Pay** [💬](tg://emoji?id=5778575233422200567)\n\n"
         f"От: {user_mention}\n"
         f"Дата: `{current_date}`\n\n"
         f"Комментарий:\n{review_text}"
@@ -1100,9 +1102,21 @@ async def process_user_review(message: Message, state: FSMContext):
 
     if REVIEWS_GROUP_ID:
         try:
-            await bot.send_message(chat_id=REVIEWS_GROUP_ID, text=formatted_review, parse_mode="Markdown")
+            # Отправляем сообщение в канал отзывов
+            sent_review_msg = await bot.send_message(
+                chat_id=REVIEWS_GROUP_ID,
+                text=formatted_review,
+                parse_mode="Markdown"
+            )
+
+            # Автоматически ставим реакцию "сердечко" на только что отправленное сообщение
+            await bot.set_message_reaction(
+                chat_id=REVIEWS_GROUP_ID,
+                message_id=sent_review_msg.message_id,
+                reaction=[ReactionTypeEmoji(emoji="❤")]
+            )
         except Exception as e:
-            logging.error(f"Не удалось отправить отзыв в группу: {e}")
+            logging.error(f"Не удалось отправить отзыв или поставить реакцию в группу: {e}")
 
     await send_log(user_id, username, "Оставил отзыв")
     await state.clear()
@@ -1404,7 +1418,9 @@ async def adm_edit_balance_save(message: Message, state: FSMContext):
                          parse_mode="Markdown")
 
     try:
-        await bot.send_message(chat_id=target_id, text=f"Администратор обновил ваш баланс. Текущий баланс: `{new_balance:.2f} USDT`", parse_mode="Markdown")
+        await bot.send_message(chat_id=target_id,
+                               text=f"Администратор обновил ваш баланс. Текущий баланс: `{new_balance:.2f} USDT`",
+                               parse_mode="Markdown")
     except Exception:
         pass
 
