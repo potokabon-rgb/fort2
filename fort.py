@@ -1024,7 +1024,7 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
   finally:
     conn.close()
 
- [cite: 10] await send_log(user_id, callback.from_user.username, f"Успешно закрыл сделку #{order_id}")
+  await send_log(user_id, callback.from_user.username, f"Успешно закрыл сделку #{order_id}")
 
   data = await state.get_data()
   await state.set_state(ReviewStates.waiting_for_review_text)
