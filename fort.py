@@ -264,10 +264,10 @@ async def send_log(user_id: int, username: str, action: str):
     try:
         user_mention = f"@{username}" if username else f"ID: `{user_id}`"
         log_text = (
-            f"🔔 **Лог системы FikSik Pay**\n\n"
-            f"👤 Пользователь: {user_mention}\n"
-            f"🆔 ID: `{user_id}`\n"
-            f"⚡️ Действие: {action}"
+            f"Лог системы FikSik Pay\n\n"
+            f"Пользователь: {user_mention}\n"
+            f"ID: `{user_id}`\n"
+            f"Действие: {action}"
         )
         await bot.send_message(chat_id=LOG_CHANNEL_ID, text=log_text, parse_mode="Markdown")
     except Exception as e:
@@ -316,29 +316,29 @@ async def check_subscription(user_id: int) -> bool:
 def sub_check_kb():
     builder = InlineKeyboardBuilder()
     if REQUIRED_CHANNEL:
-        builder.button(text="📢 Подписаться на канал", url=f"https://t.me/{REQUIRED_CHANNEL.replace('@', '')}", icon_custom_emoji_id=5920090136627908485)
-    builder.button(text="✅ Проверить подписку", callback_data="check_sub", icon_custom_emoji_id=5920052658743283381)
+        builder.button(text="Подписаться на канал", url=f"https://t.me/{REQUIRED_CHANNEL.replace('@', '')}", icon_custom_emoji_id="5920090136627908485")
+    builder.button(text="Проверить подписку", callback_data="check_sub", icon_custom_emoji_id="5920052658743283381")
     builder.adjust(1)
     return builder.as_markup()
 
 
 def main_menu_kb():
     builder = InlineKeyboardBuilder()
-    builder.button(text="👤 Личный кабинет", callback_data="profile", icon_custom_emoji_id=5883964170268840032)
-    builder.button(text="💸 Продать USDT", callback_data="sell_usdt", icon_custom_emoji_id=5992430854909989581)
-    builder.button(text="🧮 Калькулятор", callback_data="calculator", icon_custom_emoji_id=5935938364086685805)
-    builder.button(text="↗️ Актуальные курсы", callback_data="exchange_rate", icon_custom_emoji_id=5994378914636500516)
-    builder.button(text="📜 Мои заявки", callback_data="history", icon_custom_emoji_id=5967456680940671207)
-    builder.button(text="👥 Рефералы", callback_data="referral_menu", icon_custom_emoji_id=5877530150345641603)
-    builder.button(text="⭐ Отзывы", callback_data="reviews", icon_custom_emoji_id=5958376256788502078)
-    builder.button(text="💬 Поддержка", url=f"https://t.me/{SUPPORT_USERNAME.replace('@', '')}", icon_custom_emoji_id=5778575233422200567)
+    builder.button(text="Личный кабинет", callback_data="profile", icon_custom_emoji_id="5883964170268840032")
+    builder.button(text="Продать USDT", callback_data="sell_usdt", icon_custom_emoji_id="5992430854909989581")
+    builder.button(text="Калькулятор", callback_data="calculator", icon_custom_emoji_id="5935938364086685805")
+    builder.button(text="Актуальные курсы", callback_data="exchange_rate", icon_custom_emoji_id="5994378914636500516")
+    builder.button(text="Мои заявки", callback_data="history", icon_custom_emoji_id="5967456680940671207")
+    builder.button(text="Рефералы", callback_data="referral_menu", icon_custom_emoji_id="5877530150345641603")
+    builder.button(text="Отзывы", callback_data="reviews", icon_custom_emoji_id="5958376256788502078")
+    builder.button(text="Поддержка", url=f"https://t.me/{SUPPORT_USERNAME.replace('@', '')}", icon_custom_emoji_id="5778575233422200567")
     builder.adjust(2, 2, 2, 2, 1)
     return builder.as_markup()
 
 
 def menu_button_kb():
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Главное меню", callback_data="main_menu", icon_custom_emoji_id=6008258140108231117)
+    builder.button(text="Главное меню", callback_data="main_menu", icon_custom_emoji_id="6008258140108231117")
     return builder.as_markup()
 
 
@@ -373,7 +373,7 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
         conn.close()
 
     if not await check_subscription(user_id):
-        text = f"⚠️ **Требуется подписка**\n\nДля использования сервиса подпишитесь на официальный канал: `{REQUIRED_CHANNEL}`\n\nПосле подписки нажмите кнопку проверки ниже:"
+        text = f"Требуется подписка\n\nДля использования сервиса подпишитесь на официальный канал: `{REQUIRED_CHANNEL}`\n\nПосле подписки нажмите кнопку проверки ниже:"
         await edit_or_reply(event, text, reply_markup=sub_check_kb(), state=state)
         return
 
@@ -381,8 +381,8 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
         await send_log(user_id, username, "Запустил бота / Главное меню")
 
     menu_text = (
-        "💎 **FikSik Pay — Безопасный автоматизированный обмен**\n\n"
-        "🛡 **О сервисе:** Мы осуществляем моментальный и полностью безопасный обмен ваших долларов и криптовалюты USDT на банковские карты и СБП.\n"
+        "FikSik Pay — Безопасный автоматизированный обмен\n\n"
+        "О сервисе: Мы осуществляем моментальный и полностью безопасный обмен ваших долларов и криптовалюты USDT на банковские карты и СБП.\n"
         "• 100% гарантия безопасности сделок\n"
         "• Лучшие курсы рынка\n"
         "• Круглосуточная поддержка\n\n"
@@ -395,10 +395,10 @@ async def cmd_start(event: Message | CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "check_sub")
 async def process_check_sub(callback: CallbackQuery, state: FSMContext):
     if await check_subscription(callback.from_user.id):
-        await edit_or_reply(callback, "✅ **Подписка подтверждена!**\n\nГлавное меню:", reply_markup=main_menu_kb(),
+        await edit_or_reply(callback, "Подписка подтверждена!\n\nГлавное меню:", reply_markup=main_menu_kb(),
                             state=state)
     else:
-        await callback.answer("❌ Вы всё еще не подписаны на канал!", show_alert=True)
+        await callback.answer("Вы всё еще не подписаны на канал!", show_alert=True)
 
 
 @router.callback_query(F.data == "reviews")
@@ -407,14 +407,14 @@ async def reviews_handler(callback: CallbackQuery, state: FSMContext):
     await send_log(user_id, callback.from_user.username, "Открыл отзывы")
 
     text = (
-        "⭐ **Отзывы о сервисе FikSik Pay**\n\n"
+        "Отзывы о сервисе FikSik Pay\n\n"
         "Вы можете ознакомиться с реальными отзывами наших клиентов или оставить свой собственный отзыв сразу после завершения успешного обмена!"
     )
 
     builder = InlineKeyboardBuilder()
     if REVIEWS_GROUP_USERNAME:
-        builder.button(text="📖 Почитать отзывы в канале", url=f"https://t.me/{REVIEWS_GROUP_USERNAME.replace('@', '')}", icon_custom_emoji_id=5931628549088744687)
-    builder.button(text="🔙 Главное меню", callback_data="main_menu", icon_custom_emoji_id=6008258140108231117)
+        builder.button(text="Почитать отзывы в канале", url=f"https://t.me/{REVIEWS_GROUP_USERNAME.replace('@', '')}", icon_custom_emoji_id="5931628549088744687")
+    builder.button(text="Главное меню", callback_data="main_menu", icon_custom_emoji_id="6008258140108231117")
     builder.adjust(1)
 
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
@@ -438,13 +438,13 @@ async def user_profile(callback: CallbackQuery, state: FSMContext):
     balance, total, completed, joined = res if res else (0.0, 0, 0, "Неизвестно")
 
     profile_text = (
-        f"👤 **Личный кабинет**\n\n"
-        f"🆔 ID: `{user_id}`\n"
-        f"👤 Юзернейм: @{username if username else 'отсутствует'}\n"
-        f"📅 Регистрация: `{joined}`\n\n"
-        f"📊 **Статистика сделок:**\n"
-        f"💵 Баланс аккаунта: `{balance:.2f} USDT`\n"
-        f"📈 Всего заявок: `{total}` (Успешно: `{completed}`)"
+        f"Личный кабинет\n\n"
+        f"ID: `{user_id}`\n"
+        f"Юзернейм: @{username if username else 'отсутствует'}\n"
+        f"Регистрация: `{joined}`\n\n"
+        f"Статистика сделок:\n"
+        f"Баланс аккаунта: `{balance:.2f} USDT`\n"
+        f"Всего заявок: `{total}` (Успешно: `{completed}`)"
     )
 
     await edit_or_reply(callback, profile_text, reply_markup=menu_button_kb(), state=state)
@@ -465,10 +465,10 @@ async def referral_menu_handler(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     text = (
-        f"👥 **Реферальная система (3%)**\n\n"
+        f"Реферальная система (3%)\n\n"
         f"Приглашайте друзей и получайте **3%** от суммы их успешных обменов прямо на ваш баланс!\n\n"
-        f"🔗 Ваша реферальная ссылка:\n`{ref_link}`\n\n"
-        f"📊 Приглашено пользователей: `{ref_count}`"
+        f"Ваша реферальная ссылка:\n`{ref_link}`\n\n"
+        f"Приглашено пользователей: `{ref_count}`"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
 
@@ -483,12 +483,12 @@ async def calculator_start(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        "🧮 **Калькулятор USDT ➔ RUB**\n\n"
-        "📊 Действующие тарифные ставки:\n"
+        "Калькулятор USDT ➔ RUB\n\n"
+        "Действующие тарифные ставки:\n"
         f"• До {lim1} USDT ➔ `{r1} ₽`\n"
         f"• От {lim1} до {lim2} USDT ➔ `{r2} ₽`\n"
         f"• От {lim2} USDT ➔ `{r3} ₽`\n\n"
-        "💬 **Отправляйте числа сообщением — сумма будет пересчитываться автоматически:**"
+        "Отправляйте числа сообщением — сумма будет пересчитываться автоматически:"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
     await state.set_state(CalcStates.waiting_for_calc_amount)
@@ -501,7 +501,7 @@ async def calculator_process(message: Message, state: FSMContext):
         if amount <= 0:
             raise ValueError
     except ValueError:
-        text = "❌ **Некорректная сумма.**\n\nВведите число (например, `5` или `50.5`):"
+        text = "Некорректная сумма.\n\nВведите число (например, `5` или `50.5`):"
         await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
         return
 
@@ -509,11 +509,11 @@ async def calculator_process(message: Message, state: FSMContext):
     total_rub = round(amount * rate, 2)
 
     text = (
-        f"🧮 **Результат расчета:**\n\n"
-        f"💵 Сумма к обмену: `{amount} USDT`\n"
-        f"📈 Примененный курс: `{rate} ₽` / USDT\n"
-        f"💰 **Вы получите: {total_rub} ₽**\n\n"
-        f"💡 *Можете отправить другое число для мгновенного пересчета:* "
+        f"Результат расчета:\n\n"
+        f"Сумма к обмену: `{amount} USDT`\n"
+        f"Примененный курс: `{rate} ₽` / USDT\n"
+        f"Вы получите: {total_rub} ₽\n\n"
+        f"*Можете отправить другое число для мгновенного пересчета:* "
     )
 
     await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
@@ -530,12 +530,12 @@ async def sell_usdt_start(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        "💸 **Создание заявки на обмен**\n\n"
+        "Создание заявки на обмен\n\n"
         "Действующие курсы:\n"
         f"• До {lim1}$ ➔ `{r1} ₽`\n"
         f"• {lim1}-{lim2}$ ➔ `{r2} ₽`\n"
         f"• От {lim2}$ ➔ `{r3} ₽`\n\n"
-        "💬 **Отправьте сообщением сумму USDT, которую хотите обменять:**"
+        "Отправьте сообщением сумму USDT, которую хотите обменять:"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
     await state.set_state(SellStates.waiting_for_amount)
@@ -548,7 +548,7 @@ async def process_sell_amount(message: Message, state: FSMContext):
         if amount <= 0:
             raise ValueError
     except ValueError:
-        text = "❌ **Ошибка ввода.** Введите корректное число USDT (например, `10` или `25.5`):"
+        text = "Ошибка ввода. Введите корректное число USDT (например, `10` или `25.5`):"
         await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
         return
 
@@ -569,25 +569,24 @@ async def process_sell_amount(message: Message, state: FSMContext):
 
     if user_balance > 0:
         builder = InlineKeyboardBuilder()
-        builder.button(text=f"💳 Списать с баланса ({min(user_balance, amount):.2f} USDT)",
-                       callback_data="use_balance_yes", icon_custom_emoji_id=5778318458802409852)
-        builder.button(text="❌ Оплатить полностью через чек", callback_data="use_balance_no", icon_custom_emoji_id=5992430854909989581)
-        builder.button(text="🔙 Главное меню", callback_data="main_menu", icon_custom_emoji_id=6008258140108231117)
+        builder.button(text=f"Списать с баланса ({min(user_balance, amount):.2f} USDT)",
+                       callback_data="use_balance_yes", icon_custom_emoji_id="5778318458802409852")
+        builder.button(text="Оплатить полностью через чек", callback_data="use_balance_no", icon_custom_emoji_id="5992430854909989581")
+        builder.button(text="Главное меню", callback_data="main_menu", icon_custom_emoji_id="6008258140108231117")
         builder.adjust(1)
 
         text = (
-            f"💼 **Обнаружен внутренний баланс:** `{user_balance:.2f} USDT`\n\n"
+            f"Обнаружен внутренний баланс: `{user_balance:.2f} USDT`\n\n"
             f"Желаете ли вы использовать средства с баланса для частичной или полной оплаты заявки на `{amount} USDT`?"
         )
         await edit_or_reply(message, text, reply_markup=builder.as_markup(), state=state)
         await state.set_state(SellStates.waiting_for_balance_choice)
     else:
-        # Если баланса нет, сразу переходим к запросу чека
         data = await state.get_data()
         text = (
-            f"💸 **Заявка: {amount} USDT** (`{total_rub} ₽`)\n"
-            f"📈 Курс: `{rate} ₽` / USDT\n\n"
-            f"🔗 **Шаг 1 из 2:** Отправьте ссылку на чек из @CryptoBot\n"
+            f"Заявка: {amount} USDT (`{total_rub} ₽`)\n"
+            f"Курс: `{rate} ₽` / USDT\n\n"
+            f"Шаг 1 из 2: Отправьте ссылку на чек из @CryptoBot\n"
             f"*(Пример: `https://t.me/CryptoBot?start=...`)*:"
         )
         await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
@@ -609,7 +608,7 @@ async def process_balance_choice(callback: CallbackQuery, state: FSMContext):
     if callback.data == "use_balance_yes":
         if user_balance >= amount_usdt:
             used_from_balance = amount_usdt
-            link_instruction = "✅ Сумма полностью покрыта вашим внутренним балансом! Ссылка на чек не требуется."
+            link_instruction = "Сумма полностью покрыта вашим внутренним балансом! Ссылка на чек не требуется."
         else:
             used_from_balance = user_balance
             remainder_needed = round(amount_usdt - user_balance, 2)
@@ -618,7 +617,6 @@ async def process_balance_choice(callback: CallbackQuery, state: FSMContext):
     await state.update_data(used_from_balance=used_from_balance)
 
     if callback.data == "use_balance_yes" and user_balance >= amount_usdt:
-        # Сразу создаем заявку без чека, так как всё покрыто балансом
         conn = sqlite3.connect("usdt_exchange.db")
         cursor = conn.cursor()
         try:
@@ -636,8 +634,8 @@ async def process_balance_choice(callback: CallbackQuery, state: FSMContext):
         await state.update_data(order_id=order_id, check_link="Оплачено с баланса")
 
         text = (
-            "✅ **Оплата с баланса успешна!**\n\n"
-            "💳 **Шаг 2 из 2: Укажите реквизиты для получения оплаты**\n\n"
+            "Оплата с баланса успешна!\n\n"
+            "Шаг 2 из 2: Укажите реквизиты для получения оплаты\n\n"
             "Отправьте сообщением данные:\n"
             "• Номер телефона / карты\n"
             "• Название банка\n"
@@ -649,9 +647,9 @@ async def process_balance_choice(callback: CallbackQuery, state: FSMContext):
     else:
         rate, _ = get_rate_for_amount(amount_usdt)
         text = (
-            f"💸 **Заявка: {amount_usdt} USDT** (`{amount_rub} ₽`)\n"
+            f"Заявка: {amount_usdt} USDT (`{amount_rub} ₽`)\n"
             f"📊 {link_instruction}\n\n"
-            f"🔗 Отправьте ссылку на чек из `@CryptoBot`:"
+            f"Отправьте ссылку на чек из `@CryptoBot`:"
         )
         await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
         await state.set_state(SellStates.waiting_for_receipt)
@@ -662,7 +660,7 @@ async def process_sell_receipt_link(message: Message, state: FSMContext):
     check_link = message.text.strip()
     if "t.me" not in check_link.lower() and "http" not in check_link.lower():
         text = (
-            "❌ **Некорректная ссылка на чек.**\n\n"
+            "Некорректная ссылка на чек.\n\n"
             "Пожалуйста, отправьте валидную ссылку из `@CryptoBot`\n"
             "*(Пример: `https://t.me/CryptoBot?start=...`)*:"
         )
@@ -693,8 +691,8 @@ async def process_sell_receipt_link(message: Message, state: FSMContext):
     await state.update_data(order_id=order_id, check_link=check_link)
 
     text = (
-        "✅ **Ссылка принята!**\n\n"
-        "💳 **Шаг 2 из 2: Укажите реквизиты для получения оплаты**\n\n"
+        "Ссылка принята!\n\n"
+        "Шаг 2 из 2: Укажите реквизиты для получения оплаты\n\n"
         "Отправьте сообщением данные:\n"
         "• Номер телефона / карты\n"
         "• Название банка\n"
@@ -710,7 +708,7 @@ async def process_sell_requisites(message: Message, state: FSMContext):
     raw_req = message.text.strip()
 
     if len(raw_req) < 5:
-        text = "❌ **Слишком короткий текст.** Укажите подробные реквизиты (Телефон, Банк, ФИО):"
+        text = "Слишком короткий текст. Укажите подробные реквизиты (Телефон, Банк, ФИО):"
         await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
         return
 
@@ -748,24 +746,24 @@ async def process_sell_requisites(message: Message, state: FSMContext):
 
     await send_log(user_id, username, f"Создал заявку #{order_id} на сумму {amount_usdt} USDT")
 
-    balance_note = f"\n💼 Списано с баланса: `{used_from_balance:.2f} USDT`" if used_from_balance > 0 else ""
+    balance_note = f"\nСписано с баланса: `{used_from_balance:.2f} USDT`" if used_from_balance > 0 else ""
     success_text = (
-        f"⏳ **Заявка #{order_id} полностью сформирована!**\n\n"
-        f"💵 Сумма: `{amount_usdt} USDT` (`{amount_rub} ₽`){balance_note}\n"
-        f"💳 Реквизиты: `{raw_req}`\n\n"
-        f"📌 Статус: **Ожидает обработку администратором...**"
+        f"Заявка #{order_id} полностью сформирована!\n\n"
+        f"Сумма: `{amount_usdt} USDT` (`{amount_rub} ₽`){balance_note}\n"
+        f"Реквизиты: `{raw_req}`\n\n"
+        f"Статус: **Ожидает обработку администратором...**"
     )
     await edit_or_reply(message, success_text, reply_markup=main_menu_kb(), state=state)
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="📌 Взять заявку", callback_data=f"take_order_{order_id}", icon_custom_emoji_id=5906995262378741881)
+    builder.button(text="Взять заявку", callback_data=f"take_order_{order_id}", icon_custom_emoji_id="5906995262378741881")
 
     admin_text = (
-        f"🚨 **НОВАЯ ЗАЯВКА #{order_id} ГОТОВА К ОБРАБОТКЕ!**\n\n"
-        f"👤 Пользователь: @{username} (`{user_id}`)\n"
-        f"💵 Сумма: `{amount_usdt} USDT` (`{amount_rub} ₽`){balance_note}\n"
-        f"💳 Реквизиты: `{raw_req}`\n"
-        f"🔗 Чек: {check_link}"
+        f"НОВАЯ ЗАЯВКА #{order_id} ГОТОВА К ОБРАБОТКЕ!\n\n"
+        f"Пользователь: @{username} (`{user_id}`)\n"
+        f"Сумма: `{amount_usdt} USDT` (`{amount_rub} ₽`){balance_note}\n"
+        f"Реквизиты: `{raw_req}`\n"
+        f"Чек: {check_link}"
     )
 
     try:
@@ -784,7 +782,7 @@ async def process_sell_requisites(message: Message, state: FSMContext):
 @router.callback_query(F.data.startswith("take_order_"))
 async def take_order_handler(callback: CallbackQuery):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Вы не администратор!", show_alert=True)
+        await callback.answer("Вы не администратор!", show_alert=True)
         return
 
     order_id = int(callback.data.split("_")[-1])
@@ -795,12 +793,12 @@ async def take_order_handler(callback: CallbackQuery):
         res = cursor.fetchone()
 
         if not res:
-            await callback.answer("❌ Заявка не найдена в базе.", show_alert=True)
+            await callback.answer("Заявка не найдена в базе.", show_alert=True)
             return
 
         status, client_id = res
         if status not in ('Ожидает администратора', 'Ожидает реквизиты'):
-            await callback.answer(f"⚠️ Заявка уже обработана или находится в статусе: {status}", show_alert=True)
+            await callback.answer(f"Заявка уже обработана или находится в статусе: {status}", show_alert=True)
             return
 
         cursor.execute("UPDATE orders SET status = 'В работе', admin_id = ? WHERE id = ?",
@@ -810,23 +808,23 @@ async def take_order_handler(callback: CallbackQuery):
         conn.close()
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="💳 Ввести отправленную сумму", callback_data=f"pay_order_{order_id}", icon_custom_emoji_id=5994297722574737553)
+    builder.button(text="Ввести отправленную сумму", callback_data=f"pay_order_{order_id}", icon_custom_emoji_id="5994297722574737553")
 
     try:
         await callback.message.edit_text(
-            text=callback.message.text + f"\n\n🟢 **В работе у:** @{callback.from_user.username}",
+            text=callback.message.text + f"\n\nВ работе у: @{callback.from_user.username}",
             reply_markup=builder.as_markup(),
             parse_mode="Markdown"
         )
     except Exception:
         pass
 
-    await callback.answer(f"✅ Заявка #{order_id} взята в работу!")
+    await callback.answer(f"Заявка #{order_id} взята в работу!")
 
     try:
         await bot.send_message(
             chat_id=client_id,
-            text=f"🔔 **Ваша заявка #{order_id} взята в обработку администратором!** Идет проверка чека и выплата.",
+            text=f"Ваша заявка #{order_id} взята в обработку администратором! Идет проверка чека и выплата.",
             parse_mode="Markdown"
         )
     except Exception as e:
@@ -836,7 +834,7 @@ async def take_order_handler(callback: CallbackQuery):
 @router.callback_query(F.data.startswith("pay_order_"))
 async def pay_order_handler(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Вы не администратор!", show_alert=5778527486270770928)
+        await callback.answer("Вы не администратор!", show_alert=5778527486270770928)
         return
 
     order_id = int(callback.data.split("_")[-1])
@@ -845,11 +843,11 @@ async def pay_order_handler(callback: CallbackQuery, state: FSMContext):
     await state.update_data(order_id=order_id, main_msg_id=data.get("main_msg_id"))
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_menu", icon_custom_emoji_id=5778527486270770928)
+    builder.button(text="Отмена", callback_data="adm_menu", icon_custom_emoji_id="5778527486270770928")
 
     await edit_or_reply(
         callback,
-        f"💵 Введите фактически переведенную сумму в рублях (`RUB`) для заявки **#{order_id}**:",
+        f"Введите фактически переведенную сумму в рублях (`RUB`) для заявки **#{order_id}**:",
         reply_markup=builder.as_markup(),
         state=state
     )
@@ -865,14 +863,14 @@ async def process_admin_payout_amount(message: Message, state: FSMContext):
         if sent_rub < 0:
             raise ValueError
     except ValueError:
-        await edit_or_reply(message, "❌ Ошибка ввода. Введите корректную сумму числом (например, `1500`):", state=state)
+        await edit_or_reply(message, "Ошибка ввода. Введите корректную сумму числом (например, `1500`):", state=state)
         return
 
     data = await state.get_data()
     order_id = data.get("order_id")
 
     if not order_id:
-        await edit_or_reply(message, "❌ Сессия обработки заказа не найдена.", reply_markup=menu_button_kb(),
+        await edit_or_reply(message, "Сессия обработки заказа не найдена.", reply_markup=menu_button_kb(),
                             state=state)
         await state.clear()
         return
@@ -884,7 +882,7 @@ async def process_admin_payout_amount(message: Message, state: FSMContext):
         res = cursor.fetchone()
 
         if not res:
-            await edit_or_reply(message, "❌ Заявка не найдена.", reply_markup=menu_button_kb(), state=state)
+            await edit_or_reply(message, "Заявка не найдена.", reply_markup=menu_button_kb(), state=state)
             await state.clear()
             return
 
@@ -901,14 +899,14 @@ async def process_admin_payout_amount(message: Message, state: FSMContext):
             conn.commit()
 
             builder = InlineKeyboardBuilder()
-            builder.button(text="💳 Зачислить остаток на баланс ($)", callback_data=f"usr_rem_balance_{order_id}", icon_custom_emoji_id=5769403330761593044)
-            builder.button(text="☕ Оставить на чай", callback_data=f"usr_rem_tip_{order_id}", icon_custom_emoji_id=5899833370052923106)
+            builder.button(text="Зачислить остаток на баланс ($)", callback_data=f"usr_rem_balance_{order_id}", icon_custom_emoji_id="5769403330761593044")
+            builder.button(text="Оставить на чай", callback_data=f"usr_rem_tip_{order_id}", icon_custom_emoji_id="5899833370052923106")
             builder.adjust(1)
 
             user_text = (
-                f"⚠️ **Выплата по заявке #{order_id} частичная!**\n\n"
-                f"💵 Переведено: `{sent_rub} ₽` из `{expected_rub} ₽`\n"
-                f"💰 Недоплата составила: `{remainder_rub} ₽` (≈ `{remainder_usdt} USDT`)\n\n"
+                f"Выплата по заявке #{order_id} частичная!\n\n"
+                f"Переведено: `{sent_rub} ₽` из `{expected_rub} ₽`\n"
+                f"Недоплата составила: `{remainder_rub} ₽` (≈ `{remainder_usdt} USDT`)\n\n"
                 f"Укажите, как поступить с остатком средств:"
             )
 
@@ -916,7 +914,7 @@ async def process_admin_payout_amount(message: Message, state: FSMContext):
                 await bot.send_message(chat_id=client_id, text=user_text, reply_markup=builder.as_markup(),
                                        parse_mode="Markdown")
                 await edit_or_reply(message,
-                                    f"⚠️ Перевод зафиксирован частично (`{sent_rub} ₽`). Запрос решений отправлен клиенту #{client_id}.",
+                                    f"Перевод зафиксирован частично (`{sent_rub} ₽`). Запрос решений отправлен клиенту #{client_id}.",
                                     state=state)
             except Exception as e:
                 logging.error(f"Ошибка уведомления клиента: {e}")
@@ -926,7 +924,7 @@ async def process_admin_payout_amount(message: Message, state: FSMContext):
             conn.commit()
 
             await finalize_payout(bot, client_id, sent_rub, order_id)
-            await edit_or_reply(message, f"✅ Выплата по заявке #{order_id} на сумму {sent_rub} ₽ проведена.",
+            await edit_or_reply(message, f"Выплата по заявке #{order_id} на сумму {sent_rub} ₽ проведена.",
                                 state=state)
     finally:
         conn.close()
@@ -948,35 +946,35 @@ async def process_user_remainder_choice(callback: CallbackQuery, state: FSMConte
         res = cursor.fetchone()
 
         if not res:
-            await callback.answer("❌ Заявка не найдена.", show_alert=True)
+            await callback.answer("Заявка не найдена.", show_alert=True)
             return
 
         remainder_usdt, sent_rub = res
 
         if action == "balance":
             cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (remainder_usdt, user_id))
-            choice_text = f"💳 Остаток `{remainder_usdt:.2f} USDT` успешно зачислен на ваш внутренний баланс!"
+            choice_text = f"Остаток `{remainder_usdt:.2f} USDT` успешно зачислен на ваш внутренний баланс!"
         else:
-            choice_text = "☕ Большое спасибо! Остаток передан в качестве чаевых."
+            choice_text = "Большое спасибо! Остаток передан в качестве чаевых."
 
         cursor.execute("UPDATE orders SET status = 'Ожидает подтверждения' WHERE id = ?", (order_id,))
         conn.commit()
     finally:
         conn.close()
 
-    await edit_or_reply(callback, f"✅ Ваш выбор принят.\n\n{choice_text}", state=state)
+    await edit_or_reply(callback, f"Ваш выбор принят.\n\n{choice_text}", state=state)
     await finalize_payout(bot, user_id, sent_rub, order_id, extra_text=choice_text)
 
 
 async def finalize_payout(bot_instance: Bot, client_id: int, sent_rub: float, order_id: int, extra_text: str = ""):
     builder = InlineKeyboardBuilder()
-    builder.button(text="✅ Деньги пришли", callback_data=f"confirm_yes_{order_id}", icon_custom_emoji_id=5776375003280838798)
-    builder.button(text="❌ Деньги не пришли", callback_data=f"confirm_no_{order_id}", icon_custom_emoji_id=5778527486270770928)
+    builder.button(text="Деньги пришли", callback_data=f"confirm_yes_{order_id}", icon_custom_emoji_id="5776375003280838798")
+    builder.button(text="Деньги не пришли", callback_data=f"confirm_no_{order_id}", icon_custom_emoji_id="5778527486270770928")
     builder.adjust(2)
 
     extra_block = f"{extra_text}\n" if extra_text else ""
     text = (
-        f"🟢 **Выплата по заявке #{order_id} отправлена!**\n\n"
+        f"Выплата по заявке #{order_id} отправлена!\n\n"
         f"Сумма перевода: `{sent_rub}` ₽\n"
         f"{extra_block}\n"
         f"Пожалуйста, проверьте баланс карты и подтвердите получение:"
@@ -1005,18 +1003,17 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
         res = cursor.fetchone()
 
         if not res:
-            await callback.answer("❌ Заявка не найдена.", show_alert=True)
+            await callback.answer("Заявка не найдена.", show_alert=True)
             return
 
         status, amount_usdt = res
         if status == 'Завершено':
-            await callback.answer("✅ Сделка уже подтверждена ранее.", show_alert=True)
+            await callback.answer("Сделка уже подтверждена ранее.", show_alert=True)
             return
 
         cursor.execute("UPDATE orders SET status = 'Завершено' WHERE id = ?", (order_id,))
         cursor.execute("UPDATE users SET completed_deals = completed_deals + 1 WHERE user_id = ?", (user_id,))
 
-        # Реферальный бонус 3%
         cursor.execute("SELECT referrer_id FROM users WHERE user_id = ?", (user_id,))
         ref_res = cursor.fetchone()
         if ref_res and ref_res[0]:
@@ -1026,7 +1023,7 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
             try:
                 await bot.send_message(
                     chat_id=referrer_id,
-                    text=f"🎁 **Реферальный бонус!**\nПользователь по вашей ссылке успешно завершил обмен. Вам начислено `{bonus} USDT` (3%).",
+                    text=f"Реферальный бонус!\nПользователь по вашей ссылке успешно завершил обмен. Вам начислено `{bonus} USDT` (3%).",
                     parse_mode="Markdown"
                 )
             except Exception:
@@ -1043,12 +1040,12 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
     await state.update_data(order_id=order_id, main_msg_id=data.get("main_msg_id"))
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="⏭ Пропустить отзыв", callback_data="skip_review", icon_custom_emoji_id=5771511103141975115)
+    builder.button(text="Пропустить отзыв", callback_data="skip_review", icon_custom_emoji_id="5771511103141975115")
 
     await edit_or_reply(
         callback,
-        f"🎉 **Сделка #{order_id} успешно завершена!**\n\n"
-        f"⭐ Напишите короткий отзыв о работе сервиса FikSik Pay ниже:",
+        f"Сделка #{order_id} успешно завершена!\n\n"
+        f"Напишите короткий отзыв о работе сервиса FikSik Pay ниже:",
         reply_markup=builder.as_markup(),
         state=state
     )
@@ -1056,7 +1053,7 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
     try:
         await bot.send_message(
             chat_id=int(ADMIN_ID),
-            text=f"🟢 **Пользователь подтвердил получение средств по заявке #{order_id}. Сделка закрыта!**",
+            text=f"Пользователь подтвердил получение средств по заявке #{order_id}. Сделка закрыта!",
             parse_mode="Markdown"
         )
     except Exception:
@@ -1066,7 +1063,7 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "skip_review")
 async def skip_review_handler(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await edit_or_reply(callback, "💎 Спасибо за обмен! Будем рады сотрудничать снова.", reply_markup=main_menu_kb(),
+    await edit_or_reply(callback, "Спасибо за обмен! Будем рады сотрудничать снова.", reply_markup=main_menu_kb(),
                         state=state)
 
 
@@ -1080,10 +1077,10 @@ async def process_user_review(message: Message, state: FSMContext):
     current_date = datetime.now().strftime("%d.%m.%Y %H:%M")
 
     formatted_review = (
-        f"⭐ **Новый отзыв о FikSik Pay**\n\n"
-        f"👤 **От:** {user_mention}\n"
-        f"📅 **Дата:** `{current_date}`\n\n"
-        f"💬 **Комментарий:**\n{review_text}"
+        f"Новый отзыв о FikSik Pay\n\n"
+        f"От: {user_mention}\n"
+        f"Дата: `{current_date}`\n\n"
+        f"Комментарий:\n{review_text}"
     )
 
     if REVIEWS_GROUP_ID:
@@ -1095,7 +1092,7 @@ async def process_user_review(message: Message, state: FSMContext):
     await send_log(user_id, username, "Оставил отзыв")
     await state.clear()
 
-    await edit_or_reply(message, "✅ **Спасибо за ваш отзыв!** Он передан в публичный канал отзывов.",
+    await edit_or_reply(message, "Спасибо за ваш отзыв! Он передан в публичный канал отзывов.",
                         reply_markup=main_menu_kb(), state=state)
 
 
@@ -1108,13 +1105,13 @@ async def confirm_no_handler(callback: CallbackQuery, state: FSMContext):
     random_code = random.randint(1000, 9999)
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="💬 Написать поддержке", url=f"https://t.me/{SUPPORT_USERNAME.replace('@', '')}", icon_custom_emoji_id=5778575233422200567)
-    builder.button(text="🔙 Главное меню", callback_data="main_menu", icon_custom_emoji_id=6008258140108231117)
+    builder.button(text="Написать поддержке", url=f"https://t.me/{SUPPORT_USERNAME.replace('@', '')}", icon_custom_emoji_id="5778575233422200567")
+    builder.button(text="Главное меню", callback_data="main_menu", icon_custom_emoji_id="6008258140108231117")
     builder.adjust(1)
 
     instruction_text = (
-        f"⚠️ **Фиксация проблемы по заявке #{order_id}**\n\n"
-        f"‼️ **Для решения диспута запишите видео экрана:**\n\n"
+        f"Фиксация проблемы по заявке #{order_id}\n\n"
+        f"Для решения диспута запишите видео экрана:\n\n"
         f"1. Откройте мобильное приложение банка\n"
         f"2. Покажите привязанный номер СБП\n"
         f"3. Пролистайте историю операций за сегодня\n"
@@ -1128,7 +1125,7 @@ async def confirm_no_handler(callback: CallbackQuery, state: FSMContext):
     try:
         await bot.send_message(
             chat_id=int(ADMIN_ID),
-            text=f"🚨 **ВНИМАНИЕ! Диспут по заявке #{order_id}. Клиент указал, что деньги не пришли (Код проверки: {random_code})**",
+            text=f"ВНИМАНИЕ! Диспут по заявке #{order_id}. Клиент указал, что деньги не пришли (Код проверки: {random_code})",
             parse_mode="Markdown"
         )
     except Exception:
@@ -1145,11 +1142,11 @@ async def exchange_rate_handler(callback: CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        f"↗️ **Актуальные курсы обмена**\n\n"
+        f"Актуальные курсы обмена\n\n"
         f"• До {lim1} USDT ➔ `{r1} ₽` за 1 USDT\n"
         f"• От {lim1} до {lim2} USDT ➔ `{r2} ₽` за 1 USDT\n"
         f"• От {lim2} USDT ➔ `{r3} ₽` за 1 USDT\n\n"
-        f"⚠️ Расчет курса пересчитывается автоматически."
+        f"Расчет курса пересчитывается автоматически."
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
 
@@ -1177,17 +1174,17 @@ async def history_handler(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     text = (
-        f"📜 **История ваших операций**\n\n"
-        f"📊 Всего заявок: `{total_q}` | Завершено: `{completed_q}`\n\n"
+        f"История ваших операций\n\n"
+        f"Всего заявок: `{total_q}` | Завершено: `{completed_q}`\n\n"
         f"Последние действия:"
     )
 
     builder = InlineKeyboardBuilder()
     if orders:
         for o_id, a_usdt, a_rub, status in orders:
-            builder.button(text=f"#{o_id} | {a_usdt} USDT ({status})", callback_data=f"view_order_{o_id}", icon_custom_emoji_id=5992430854909989581)
+            builder.button(text=f"#{o_id} | {a_usdt} USDT ({status})", callback_data=f"view_order_{o_id}", icon_custom_emoji_id="5992430854909989581")
 
-    builder.button(text="🔙 Главное меню", callback_data="main_menu", icon_custom_emoji_id=6008258140108231117)
+    builder.button(text="Главное меню", callback_data="main_menu", icon_custom_emoji_id="6008258140108231117")
     builder.adjust(1)
 
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
@@ -1207,31 +1204,31 @@ async def view_order_details(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     if not res:
-        await callback.answer("❌ Заявка не найдена.", show_alert=True)
+        await callback.answer("Заявка не найдена.", show_alert=True)
         return
 
     usdt, rub, status, link, phone, bank, fio, created = res
     text = (
-        f"📄 **Детали заявки #{o_id}**\n\n"
-        f"💵 Сумма: `{usdt} USDT`\n"
-        f"💰 Ожидается к выплате: `{rub} ₽`\n"
-        f"📞 Телефон: `{phone}`\n"
-        f"🏦 Банк: `{bank}`\n"
-        f"👤 ФИО: `{fio}`\n"
-        f"📌 Текущий статус: `{status}`\n"
-        f"🔗 Чек: {link}\n"
-        f"⏱ Время создания: `{created}`"
+        f"Детали заявки #{o_id}\n\n"
+        f"Сумма: `{usdt} USDT`\n"
+        f"Ожидается к выплате: `{rub} ₽`\n"
+        f"Телефон: `{phone}`\n"
+        f"Банк: `{bank}`\n"
+        f"ФИО: `{fio}`\n"
+        f"Текущий статус: `{status}`\n"
+        f"Чек: {link}\n"
+        f"Время создания: `{created}`"
     )
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 К истории", callback_data="history", icon_custom_emoji_id=5956561916573782596)
+    builder.button(text="К истории", callback_data="history", icon_custom_emoji_id="5956561916573782596")
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
 
 
 @router.message(Command("admin543"))
 async def admin_panel_command(message: Message, state: FSMContext):
     if message.from_user.id != int(ADMIN_ID):
-        await message.answer("⛔ Недостаточно прав!")
+        await message.answer("Недостаточно прав!")
         return
     await state.clear()
     await show_admin_menu(message, state)
@@ -1267,26 +1264,26 @@ async def show_admin_menu(event: Message | CallbackQuery, state: FSMContext):
     lim2 = get_setting("tier_limit_2")
 
     text = (
-        f"👑 **Панель управления сервисом FikSik Pay**\n\n"
-        f"👥 Всего пользователей: `{users_count}`\n"
-        f"📦 Новые заявки: `{pending_count}`\n"
-        f"🔄 Активные заявки в работе: `{in_progress_count}`\n"
-        f"✅ Успешно завершено сделок: `{completed_count}`\n\n"
-        f"⚙️ **Текущие курсы и лимиты:**\n"
+        f"Панель управления сервисом FikSik Pay\n\n"
+        f"Всего пользователей: `{users_count}`\n"
+        f"Новые заявки: `{pending_count}`\n"
+        f"Активные заявки в работе: `{in_progress_count}`\n"
+        f"Успешно завершено сделок: `{completed_count}`\n\n"
+        f"Текущие курсы и лимиты:\n"
         f"• До {lim1}$ ➔ `{r1} ₽`\n"
         f"• {lim1}-{lim2}$ ➔ `{r2} ₽`\n"
         f"• От {lim2}$ ➔ `{r3} ₽`"
     )
 
     builder = InlineKeyboardBuilder()
-    builder.button(text=f"📦 Ожидают ({pending_count})", callback_data="adm_pending_orders", icon_custom_emoji_id=5942640218170461901)
-    builder.button(text=f"🔄 В работе ({in_progress_count})", callback_data="adm_in_progress_orders", icon_custom_emoji_id=5943042214224465443)
-    builder.button(text="✅ Завершенные сделки", callback_data="adm_completed_orders", icon_custom_emoji_id=5933613451044720529)
-    builder.button(text="💱 Изменить курсы/лимиты", callback_data="adm_rates_menu", icon_custom_emoji_id=5931515758952583071)
-    builder.button(text="📢 Рассылка", callback_data="adm_broadcast", icon_custom_emoji_id=5771695636411847302)
-    builder.button(text="📁 Выгрузить юзеров (TXT)", callback_data="adm_export_users", icon_custom_emoji_id=5908808657700655253)
-    builder.button(text="📁 Выгрузить логи (TXT)", callback_data="adm_export_system_logs", icon_custom_emoji_id=6017174676898321263)
-    builder.button(text="🚪 Выход в меню", callback_data="main_menu", icon_custom_emoji_id=6008258140108231117)
+    builder.button(text=f"Ожидают ({pending_count})", callback_data="adm_pending_orders", icon_custom_emoji_id="5942640218170461901")
+    builder.button(text=f"В работе ({in_progress_count})", callback_data="adm_in_progress_orders", icon_custom_emoji_id="5943042214224465443")
+    builder.button(text="Завершенные сделки", callback_data="adm_completed_orders", icon_custom_emoji_id="5933613451044720529")
+    builder.button(text="Изменить курсы/лимиты", callback_data="adm_rates_menu", icon_custom_emoji_id="5931515758952583071")
+    builder.button(text="Рассылка", callback_data="adm_broadcast", icon_custom_emoji_id="5771695636411847302")
+    builder.button(text="Выгрузить юзеров (TXT)", callback_data="adm_export_users", icon_custom_emoji_id="5908808657700655253")
+    builder.button(text="Выгрузить логи (TXT)", callback_data="adm_export_system_logs", icon_custom_emoji_id="6017174676898321263")
+    builder.button(text="Выход в меню", callback_data="main_menu", icon_custom_emoji_id="6008258140108231117")
     builder.adjust(2, 1, 2, 2, 1)
 
     await edit_or_reply(event, text, reply_markup=builder.as_markup(), state=state)
@@ -1304,21 +1301,21 @@ async def adm_rates_menu(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != int(ADMIN_ID):
         return
     builder = InlineKeyboardBuilder()
-    builder.button(text="💱 Курс (1)", callback_data="adm_set_rate_1", icon_custom_emoji_id=5931515758952583071)
-    builder.button(text="💱 Курс (2)", callback_data="adm_set_rate_2", icon_custom_emoji_id=5931515758952583071)
-    builder.button(text="💱 Курс (3)", callback_data="adm_set_rate_3", icon_custom_emoji_id=5931515758952583071)
-    builder.button(text="📊 Лимит 1", callback_data="adm_set_limit_1", icon_custom_emoji_id=5924720918826848520)
-    builder.button(text="📊 Лимит 2", callback_data="adm_set_limit_2", icon_custom_emoji_id=5924720918826848520)
-    builder.button(text="🔙 Назад", callback_data="adm_menu", icon_custom_emoji_id=5778527486270770928)
+    builder.button(text="Курс (1)", callback_data="adm_set_rate_1", icon_custom_emoji_id="5931515758952583071")
+    builder.button(text="Курс (2)", callback_data="adm_set_rate_2", icon_custom_emoji_id="5931515758952583071")
+    builder.button(text="Курс (3)", callback_data="adm_set_rate_3", icon_custom_emoji_id="5931515758952583071")
+    builder.button(text="Лимит 1", callback_data="adm_set_limit_1", icon_custom_emoji_id="5924720918826848520")
+    builder.button(text="Лимит 2", callback_data="adm_set_limit_2", icon_custom_emoji_id="5924720918826848520")
+    builder.button(text="Назад", callback_data="adm_menu", icon_custom_emoji_id="5778527486270770928")
     builder.adjust(3, 2, 1)
-    await edit_or_reply(callback, "⚙️ **Управление курсами и диапазонами:**", reply_markup=builder.as_markup(),
+    await edit_or_reply(callback, "Управление курсами и диапазонами:", reply_markup=builder.as_markup(),
                         state=state)
 
 
 @router.callback_query(F.data == "adm_pending_orders")
 async def adm_pending_orders(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Недостаточно прав!", show_alert=True)
+        await callback.answer("Недостаточно прав!", show_alert=True)
         return
 
     conn = sqlite3.connect("usdt_exchange.db")
@@ -1343,17 +1340,17 @@ async def adm_pending_orders(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     if not orders:
-        await callback.answer("📭 Нет нераспределенных заявок.", show_alert=True)
+        await callback.answer("Нет нераспределенных заявок.", show_alert=True)
         return
 
     builder = InlineKeyboardBuilder()
-    text = "📦 **Необработанные заявки:**\n\n"
+    text = "Необработанные заявки:\n\n"
     for o_id, u_id, usdt, rub, phone, bank, fio, status, check_link in orders:
-        req_info = f"📞 `{phone}` | 🏦 `{bank}` | 👤 `{fio}`" if phone else "⚠️ *Реквизиты еще не введены*"
+        req_info = f"📞 `{phone}` | 🏦 `{bank}` | 👤 `{fio}`" if phone else "*Реквизиты еще не введены*"
         text += f"🆔 **#{o_id}** [{status}] | `{usdt} USDT` (`{rub} ₽`)\n🔗 Чек: {check_link}\n{req_info}\n\n"
-        builder.button(text=f"📌 Взять #{o_id}", callback_data=f"take_order_{o_id}", icon_custom_emoji_id=5906995262378741881)
+        builder.button(text=f"Взять #{o_id}", callback_data=f"take_order_{o_id}", icon_custom_emoji_id="5906995262378741881")
 
-    builder.button(text="🔙 Панель управления", callback_data="adm_menu", icon_custom_emoji_id=5775887550262546277)
+    builder.button(text="Панель управления", callback_data="adm_menu", icon_custom_emoji_id="5775887550262546277")
     builder.adjust(1)
 
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
@@ -1362,7 +1359,7 @@ async def adm_pending_orders(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "adm_in_progress_orders")
 async def adm_in_progress_orders(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Недостаточно прав!", show_alert=True)
+        await callback.answer("Недостаточно прав!", show_alert=True)
         return
 
     conn = sqlite3.connect("usdt_exchange.db")
@@ -1386,16 +1383,16 @@ async def adm_in_progress_orders(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     if not orders:
-        await callback.answer("📭 Нет активных процессов.", show_alert=True)
+        await callback.answer("Нет активных процессов.", show_alert=True)
         return
 
     builder = InlineKeyboardBuilder()
-    text = "🔄 **Заявки в обработке:**\n\n"
+    text = "Заявки в обработке:\n\n"
     for o_id, u_id, usdt, rub, phone, bank, fio, status in orders:
         text += f"🆔 **#{o_id}** [{status}] | `{usdt} USDT` (`{rub} ₽`)\n📞 `{phone}` | 🏦 `{bank}` | 👤 `{fio}`\n\n"
-        builder.button(text=f"💳 Перевод по #{o_id}", callback_data=f"pay_order_{o_id}", icon_custom_emoji_id=5897958754267174109)
+        builder.button(text=f"Перевод по #{o_id}", callback_data=f"pay_order_{o_id}", icon_custom_emoji_id="5897958754267174109")
 
-    builder.button(text="🔙 Панель управления", callback_data="adm_menu", icon_custom_emoji_id=5775887550262546277)
+    builder.button(text="Панель управления", callback_data="adm_menu", icon_custom_emoji_id="5775887550262546277")
     builder.adjust(1)
 
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
@@ -1404,7 +1401,7 @@ async def adm_in_progress_orders(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "adm_completed_orders")
 async def adm_completed_orders(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Недостаточно прав!", show_alert=True)
+        await callback.answer("Недостаточно прав!", show_alert=True)
         return
 
     conn = sqlite3.connect("usdt_exchange.db")
@@ -1421,15 +1418,15 @@ async def adm_completed_orders(callback: CallbackQuery, state: FSMContext):
         conn.close()
 
     if not orders:
-        await callback.answer("📭 Завершенных сделок пока нет.", show_alert=True)
+        await callback.answer("Завершенных сделок пока нет.", show_alert=True)
         return
 
-    text = "✅ **История последних выполненных сделок:**\n\n"
+    text = "История последних выполненных сделок:\n\n"
     for o_id, u_id, usdt, rub, sent_rub in orders:
         text += f"🆔 **#{o_id}** | ID Клиента: `{u_id}` | `{usdt} USDT` ➔ `{sent_rub or rub} ₽`\n"
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Панель управления", callback_data="adm_menu", icon_custom_emoji_id=5775887550262546277)
+    builder.button(text="Панель управления", callback_data="adm_menu", icon_custom_emoji_id="5775887550262546277")
 
     await edit_or_reply(callback, text, reply_markup=builder.as_markup(), state=state)
 
@@ -1441,8 +1438,8 @@ async def adm_broadcast_start(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(main_msg_id=data.get("main_msg_id"))
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_menu", icon_custom_emoji_id=5778527486270770928)
-    await edit_or_reply(callback, "📢 Отправьте текст для рассылки всем пользователям:",
+    builder.button(text="Отмена", callback_data="adm_menu", icon_custom_emoji_id="5778527486270770928")
+    await edit_or_reply(callback, "Отправьте текст для рассылки всем пользователям:",
                         reply_markup=builder.as_markup(), state=state)
     await state.set_state(AdminStates.waiting_for_broadcast)
 
@@ -1461,7 +1458,7 @@ async def adm_broadcast_process(message: Message, state: FSMContext):
         conn.close()
 
     success, failed = 0, 0
-    await message.answer("🚀 Рассылка запущена...")
+    await message.answer("Рассылка запущена...")
     for (uid,) in users:
         try:
             await bot.send_message(chat_id=uid, text=text, parse_mode="Markdown")
@@ -1470,7 +1467,7 @@ async def adm_broadcast_process(message: Message, state: FSMContext):
         except Exception:
             failed += 1
 
-    await message.answer(f"✅ Рассылка завершена!\nУспешно: `{success}`\nНе удалось: `{failed}`")
+    await message.answer(f"Рассылка завершена!\nУспешно: `{success}`\nНе удалось: `{failed}`")
     await state.clear()
     await show_admin_menu(message, state)
 
@@ -1481,8 +1478,8 @@ async def adm_set_rate_1_start(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(main_msg_id=data.get("main_msg_id"))
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id=5778527486270770928)
-    await edit_or_reply(callback, "💱 Введите новый курс для Tier 1:", reply_markup=builder.as_markup(), state=state)
+    builder.button(text="Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id="5778527486270770928")
+    await edit_or_reply(callback, "Введите новый курс для Tier 1:", reply_markup=builder.as_markup(), state=state)
     await state.set_state(AdminStates.waiting_for_rate_1)
 
 
@@ -1495,7 +1492,7 @@ async def adm_save_rate_1(message: Message, state: FSMContext):
         await state.clear()
         await show_admin_menu(message, state)
     except ValueError:
-        await edit_or_reply(message, "❌ Введите корректное число:", state=state)
+        await edit_or_reply(message, "Введите корректное число:", state=state)
 
 
 @router.callback_query(F.data == "adm_set_rate_2")
@@ -1504,8 +1501,8 @@ async def adm_set_rate_2_start(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(main_msg_id=data.get("main_msg_id"))
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id=5778527486270770928)
-    await edit_or_reply(callback, "💱 Введите новый курс для Tier 2:", reply_markup=builder.as_markup(), state=state)
+    builder.button(text="Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id="5778527486270770928")
+    await edit_or_reply(callback, "Введите новый курс для Tier 2:", reply_markup=builder.as_markup(), state=state)
     await state.set_state(AdminStates.waiting_for_rate_2)
 
 
@@ -1518,7 +1515,7 @@ async def adm_save_rate_2(message: Message, state: FSMContext):
         await state.clear()
         await show_admin_menu(message, state)
     except ValueError:
-        await edit_or_reply(message, "❌ Введите корректное число:", state=state)
+        await edit_or_reply(message, "Введите корректное число:", state=state)
 
 
 @router.callback_query(F.data == "adm_set_rate_3")
@@ -1527,8 +1524,8 @@ async def adm_set_rate_3_start(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(main_msg_id=data.get("main_msg_id"))
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id=5778527486270770928)
-    await edit_or_reply(callback, "💱 Введите новый курс для Tier 3:", reply_markup=builder.as_markup(), state=state)
+    builder.button(text="Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id="5778527486270770928")
+    await edit_or_reply(callback, "Введите новый курс для Tier 3:", reply_markup=builder.as_markup(), state=state)
     await state.set_state(AdminStates.waiting_for_rate_3)
 
 
@@ -1541,7 +1538,7 @@ async def adm_save_rate_3(message: Message, state: FSMContext):
         await state.clear()
         await show_admin_menu(message, state)
     except ValueError:
-        await edit_or_reply(message, "❌ Введите корректное число:", state=state)
+        await edit_or_reply(message, "Введите корректное число:", state=state)
 
 
 @router.callback_query(F.data == "adm_set_limit_1")
@@ -1550,8 +1547,8 @@ async def adm_set_limit_1_start(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(main_msg_id=data.get("main_msg_id"))
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id=5778527486270770928)
-    await edit_or_reply(callback, "📊 Введите верхнюю границу для Tier 1 (например, `6.0`):",
+    builder.button(text="Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id="5778527486270770928")
+    await edit_or_reply(callback, "Введите верхнюю границу для Tier 1 (например, `6.0`):",
                         reply_markup=builder.as_markup(), state=state)
     await state.set_state(AdminStates.waiting_for_limit_1)
 
@@ -1565,7 +1562,7 @@ async def adm_save_limit_1(message: Message, state: FSMContext):
         await state.clear()
         await show_admin_menu(message, state)
     except ValueError:
-        await edit_or_reply(message, "❌ Введите число:", state=state)
+        await edit_or_reply(message, "Введите число:", state=state)
 
 
 @router.callback_query(F.data == "adm_set_limit_2")
@@ -1574,8 +1571,8 @@ async def adm_set_limit_2_start(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.update_data(main_msg_id=data.get("main_msg_id"))
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id=5778527486270770928)
-    await edit_or_reply(callback, "📊 Введите верхнюю границу для Tier 2 (например, `20.0`):",
+    builder.button(text="Отмена", callback_data="adm_rates_menu", icon_custom_emoji_id="5778527486270770928")
+    await edit_or_reply(callback, "Введите верхнюю границу для Tier 2 (например, `20.0`):",
                         reply_markup=builder.as_markup(), state=state)
     await state.set_state(AdminStates.waiting_for_limit_2)
 
@@ -1589,13 +1586,13 @@ async def adm_save_limit_2(message: Message, state: FSMContext):
         await state.clear()
         await show_admin_menu(message, state)
     except ValueError:
-        await edit_or_reply(message, "❌ Введите число:", state=state)
+        await edit_or_reply(message, "Введите число:", state=state)
 
 
 @router.callback_query(F.data == "adm_export_users")
 async def adm_export_users(callback: CallbackQuery):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Недостаточно прав!", show_alert=True)
+        await callback.answer("Недостаточно прав!", show_alert=True)
         return
 
     conn = sqlite3.connect("usdt_exchange.db")
@@ -1616,7 +1613,7 @@ async def adm_export_users(callback: CallbackQuery):
 
     await callback.message.answer_document(
         document=FSInputFile(filename),
-        caption="📁 **Список пользователей системы:**"
+        caption="Список пользователей системы:"
     )
     await callback.answer()
 
@@ -1624,7 +1621,7 @@ async def adm_export_users(callback: CallbackQuery):
 @router.callback_query(F.data == "adm_export_system_logs")
 async def adm_export_system_logs(callback: CallbackQuery):
     if callback.from_user.id != int(ADMIN_ID):
-        await callback.answer("⛔ Недостаточно прав!", show_alert=True)
+        await callback.answer("Недостаточно прав!", show_alert=True)
         return
 
     conn = sqlite3.connect("usdt_exchange.db")
@@ -1645,7 +1642,7 @@ async def adm_export_system_logs(callback: CallbackQuery):
 
     await callback.message.answer_document(
         document=FSInputFile(filename),
-        caption="📁 **Лог действий:**"
+        caption="Лог действий:"
     )
     await callback.answer()
 
