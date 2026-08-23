@@ -438,7 +438,7 @@ async def process_check_sub(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "reviews")
 async def reviews_handler(callback: CallbackQuery, state: FSMContext):
   user_id = callback.from_user.id
- [cite: 10] await send_log(user_id, callback.from_user.username, "Открыл отзывы")
+  await send_log(user_id, callback.from_user.username, "Открыл отзывы")
 
   text = (
       "[⭐](tg://emoji?id=5958376256788502078) **Отзывы о сервисе Fortuna Pay** [💬](tg://emoji?id=5778575233422200567)\n\n"
