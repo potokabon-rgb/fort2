@@ -23,7 +23,7 @@ TOKEN = "8919102783:AAFlB5ICuD7WzONLHzeW5dspJKj17TT7UMg"
 ADMIN_ID = 8887644613
 
 # Строка подключения к PostgreSQL
-DATABASE_URL = "postgresql://postgres.ycslyqhavhgproqrqvvs:[YOUR-PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+DATABASE_URL = "DATABASE_URL=postgresql://postgres.ycslyqhavhgproqrqvvs:TRKWhIlMeqpkMJBX@18.198.145.223:5432/postgres"
 
 SUPPORT_USERNAME = "@Derzywork"
 REQUIRED_CHANNEL = "@FortunaPayNews"
