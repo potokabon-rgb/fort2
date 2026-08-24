@@ -20,7 +20,7 @@ import asyncpg
 
 logging.basicConfig(level=logging.INFO)
 TOKEN = "8919102783:AAFlB5ICuD7WzONLHzeW5dspJKj17TT7UMg"
-ADMIN_ID = 8075312868
+ADMIN_ID = 8887644613
 
 # Строка подключения к PostgreSQL
 DATABASE_URL = "postgresql://postgres:TRKWhIlMeqpkMJBX@db.ycslyqhavhgproqrqvvs.supabase.co:5432/postgres"
@@ -2234,12 +2234,13 @@ async def adm_export_users(callback: CallbackQuery):
     file_content += "-" * 63 + "\n"
     for row in users:
         uname_str = f"@{row['username']}" if row['username'] else "none"
+        balance_str = f"{row['balance']} USDT"
         file_content += (
-            f"{str(row['user_id']):<15} | {uname_str:<20} | {f'{row[\"balance\"]} USDT':<12} |"
+            f"{str(row['user_id']):<15} | {uname_str:<20} | {balance_str:<12} |"
             f" {str(row['total_deals']):<6}\n"
         )
 
-        filename = "users_export.txt"
+    filename = "users_export.txt"
     with open(filename, "w", encoding="utf-8") as f:
         f.write(file_content)
 
@@ -2254,6 +2255,7 @@ async def adm_export_users(callback: CallbackQuery):
 async def adm_export_system_logs(callback: CallbackQuery):
     if callback.from_user.id != int(ADMIN_ID):
         await callback.answer("Недостаточно прав!", show_alert=True)
+
         return
 
     async with db_pool.acquire() as conn:
@@ -2266,12 +2268,13 @@ async def adm_export_system_logs(callback: CallbackQuery):
     file_content += "-" * 105 + "\n"
     for row in logs:
         uname_str = f"@{row['username']}" if row['username'] else "none"
+        id_str = f"#{row['id']}"
         file_content += (
-            f"{f'#{row[\"id\"]}':<6} | {str(row['user_id']):<15} | {uname_str:<18} |"
+            f"{id_str:<6} | {str(row['user_id']):<15} | {uname_str:<18} |"
             f" {str(row['action']):<35} | {str(row['created_at']):<19}\n"
         )
 
-        filename = "system_logs_export.txt"
+    filename = "system_logs_export.txt"
     with open(filename, "w", encoding="utf-8") as f:
         f.write(file_content)
 
