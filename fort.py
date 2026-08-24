@@ -20,7 +20,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 logging.basicConfig(level=logging.INFO)
 TOKEN = "8919102783:AAFlB5ICuD7WzONLHzeW5dspJKj17TT7UMg"
-ADMIN_ID = 8887644613
+ADMIN_ID = 8075312868
 
 SUPPORT_USERNAME = "@Derzywork"
 REQUIRED_CHANNEL = "@FortunaPayNews"
