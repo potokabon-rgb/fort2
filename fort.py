@@ -378,6 +378,7 @@ class SellStates(StatesGroup):
     waiting_for_receipt = State()
     waiting_for_card = State()
     waiting_for_bank = State()
+    waiting_for_custom_bank = State()  # Новое состояние для ввода своего банка
     waiting_for_fio = State()
 
 
@@ -874,7 +875,7 @@ async def process_balance_choice(callback: CallbackQuery, state: FSMContext):
 
         text = (
             "Оплата с баланса успешна!\n\nШаг 2 из 4: Укажите **номер карты** или"
-            " **номер телефона** (для СБП):"
+            " **номер телефона**:"
         )
         await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
         await state.set_state(SellStates.waiting_for_card)
@@ -896,7 +897,6 @@ async def process_balance_choice(callback: CallbackQuery, state: FSMContext):
 async def process_sell_receipt_link(message: Message, state: FSMContext):
     check_link = message.text.strip()
 
-    # Улучшенная регулярная проверка валидности ссылки CryptoBot
     crypto_bot_pattern = r"^https?://t\.me/(CryptoBot|send\b|cryptobot\b).*$"
     if not re.match(crypto_bot_pattern, check_link, re.IGNORECASE) and "t.me/" not in check_link.lower():
         text = (
@@ -938,7 +938,7 @@ async def process_sell_receipt_link(message: Message, state: FSMContext):
 
     text = (
         "✅ **Ссылка принята!**\n\n"
-        "Шаг 2 из 4: Укажите **номер карты** или **номер телефона** (для СБП):"
+        "Шаг 2 из 4: Укажите **номер карты** или **номер телефона**:"
     )
     await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
     await state.set_state(SellStates.waiting_for_card)
@@ -957,7 +957,6 @@ async def process_sell_card(message: Message, state: FSMContext):
     builder = InlineKeyboardBuilder()
     builder.button(text="Т-Банк", callback_data="bank_tinkoff")
     builder.button(text="Сбербанк", callback_data="bank_sber")
-    builder.button(text="СБП", callback_data="bank_sbp")
     builder.button(text="Другой банк", callback_data="bank_other")
     builder.adjust(1)
 
@@ -973,9 +972,15 @@ async def process_sell_bank_choice(callback: CallbackQuery, state: FSMContext):
     bank_map = {
         "bank_tinkoff": "Т-Банк",
         "bank_sber": "Сбербанк",
-        "bank_sbp": "СБП",
-        "bank_other": "Другой банк",
     }
+
+    # Если выбрали "Другой банк", запрашиваем название текста сообщением
+    if callback.data == "bank_other":
+        text = "Введите название вашего банка:"
+        await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
+        await state.set_state(SellStates.waiting_for_custom_bank)
+        return
+
     selected_bank = bank_map.get(callback.data, "Т-Банк")
     await state.update_data(temp_bank=selected_bank)
 
@@ -985,6 +990,26 @@ async def process_sell_bank_choice(callback: CallbackQuery, state: FSMContext):
         " Иванович`):"
     )
     await edit_or_reply(callback, text, reply_markup=menu_button_kb(), state=state)
+    await state.set_state(SellStates.waiting_for_fio)
+
+
+# Обработчик ввода своего банка текстом
+@router.message(SellStates.waiting_for_custom_bank)
+async def process_custom_bank(message: Message, state: FSMContext):
+    custom_bank = message.text.strip()
+    if len(custom_bank) < 2:
+        text = "Слишком короткое название. Введите корректное название банка:"
+        await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
+        return
+
+    await state.update_data(temp_bank=custom_bank)
+
+    text = (
+        f"Банк выбран: **{custom_bank}**\n\n"
+        "Шаг 4 из 4: Введите **ФИО получателя** полностью (например, `Иванов Иван"
+        " Иванович`):"
+    )
+    await edit_or_reply(message, text, reply_markup=menu_button_kb(), state=state)
     await state.set_state(SellStates.waiting_for_fio)
 
 
@@ -1564,7 +1589,7 @@ async def confirm_no_handler(callback: CallbackQuery, state: FSMContext):
     instruction_text = (
         f"Фиксация проблемы по заявке #{order_id}\n\nДля решения диспута запишите"
         f" видео экрана:\n\n1. Откройте мобильное приложение банка\n2. Покажите"
-        f" привязанный номер СБП\n3. Пролистайте историю операций за"
+        f" привязанный номер телефона\n3. Пролистайте историю операций за"
         f" сегодня\n4. Откройте чек любой последней операции\n5. Напишите код"
         f" `{random_code}` в любом поле ввода\n\nОтправьте запись администратору"
         " поддержки."
@@ -1683,7 +1708,7 @@ async def view_order_details(callback: CallbackQuery, state: FSMContext):
     usdt, rub, status, link, phone, bank, fio, created = res
     text = (
         f"Детали заявки #{o_id}\n\nСумма: `{usdt} USDT`\nОжидается к выплате:"
-        f" `{rub} ₽`\nТелефон: `{phone}`\nБанк: `{bank}`\nФИО: `{fio}`\nТекущий"
+        f" `{rub} ₽`\nТелефон/Карта: `{phone}`\nБанк: `{bank}`\nФИО: `{fio}`\nТекущий"
         f" статус: `{status}`\nЧек: {link}\nВремя создания: `{created}`"
     )
 
