@@ -20,7 +20,16 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 logging.basicConfig(level=logging.INFO)
 TOKEN = "8919102783:AAFlB5ICuD7WzONLHzeW5dspJKj17TT7UMg"
-ADMIN_ID = 8075312868
+
+# --- СПИСОК АДМИНИСТРАТОРОВ ---
+# Добавьте сюда Telegram ID всех администраторов через запятую
+ADMIN_IDS = [8075312868]  # Пример: [8075312868, 987654321]
+
+
+def is_admin(user_id: int) -> bool:
+  """Проверяет, является ли пользователь администратором."""
+  return user_id in ADMIN_IDS
+
 
 SUPPORT_USERNAME = "@Derzywork"
 REQUIRED_CHANNEL = "@FortunaPayNews"
@@ -110,7 +119,6 @@ def init_db():
         " ('tier_limit_3', '80.0')"
     )
 
-    # Инициализация ключей фотографий для всех разделов
     photo_keys = [
         "main_menu_photo",
         "profile_photo",
@@ -347,7 +355,7 @@ class AdminStates(StatesGroup):
   waiting_for_broadcast = State()
   waiting_for_user_id_to_edit = State()
   waiting_for_new_balance = State()
-  waiting_for_category_photo = State()  # Универсальный стейт для загрузки фото
+  waiting_for_category_photo = State()
 
 
 async def check_subscription(user_id: int) -> bool:
@@ -997,22 +1005,24 @@ async def process_sell_requisites(message: Message, state: FSMContext):
       f" ₽`){balance_note}\nРеквизиты: `{raw_req}`\nЧек: {check_link}"
   )
 
-  try:
-    await message.bot.send_message(
-        chat_id=int(ADMIN_ID),
-        text=admin_text,
-        reply_markup=builder.as_markup(),
-        parse_mode="Markdown",
-    )
-  except Exception as e:
-    logging.error(f"Не удалось отправить уведомление админу: {e}")
+  # Рассылаем уведомление ВСЕМ администраторам из списка
+  for adm_id in ADMIN_IDS:
+    try:
+      await message.bot.send_message(
+          chat_id=adm_id,
+          text=admin_text,
+          reply_markup=builder.as_markup(),
+          parse_mode="Markdown",
+      )
+    except Exception as e:
+      logging.error(f"Не удалось отправить уведомление админу {adm_id}: {e}")
 
   await state.clear()
 
 
 @router.callback_query(F.data.startswith("take_order_"))
 async def take_order_handler(callback: CallbackQuery):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Вы не администратор!", show_alert=True)
     return
 
@@ -1079,7 +1089,7 @@ async def take_order_handler(callback: CallbackQuery):
 
 @router.callback_query(F.data.startswith("pay_order_"))
 async def pay_order_handler(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Вы не администратор!", show_alert=True)
     return
 
@@ -1108,7 +1118,7 @@ async def pay_order_handler(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_payout_amount)
 async def process_admin_payout_amount(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
 
   try:
@@ -1407,17 +1417,19 @@ async def confirm_yes_handler(callback: CallbackQuery, state: FSMContext):
       state=state,
   )
 
-  try:
-    await bot.send_message(
-        chat_id=int(ADMIN_ID),
-        text=(
-            "Пользователь подтвердил получение средств по заявке"
-            f" #{order_id}. Сделка закрыта!"
-        ),
-        parse_mode="Markdown",
-    )
-  except Exception:
-    pass
+  # Уведомляем всех админов о завершении сделки
+  for adm_id in ADMIN_IDS:
+    try:
+      await bot.send_message(
+          chat_id=adm_id,
+          text=(
+              "Пользователь подтвердил получение средств по заявке"
+              f" #{order_id}. Сделка закрыта!"
+          ),
+          parse_mode="Markdown",
+      )
+    except Exception:
+      pass
 
 
 @router.callback_query(F.data == "skip_review")
@@ -1508,17 +1520,18 @@ async def confirm_no_handler(callback: CallbackQuery, state: FSMContext):
       callback, instruction_text, reply_markup=builder.as_markup(), state=state
   )
 
-  try:
-    await bot.send_message(
-        chat_id=int(ADMIN_ID),
-        text=(
-            f"ВНИМАНИЕ! Диспут по заявке #{order_id}. Клиент указал, что деньги"
-            f" не пришли (Код проверки: {random_code})"
-        ),
-        parse_mode="Markdown",
-    )
-  except Exception:
-    pass
+  for adm_id in ADMIN_IDS:
+    try:
+      await bot.send_message(
+          chat_id=adm_id,
+          text=(
+              f"ВНИМАНИЕ! Диспут по заявке #{order_id}. Клиент указал, что деньги"
+              f" не пришли (Код проверки: {random_code})"
+          ),
+          parse_mode="Markdown",
+      )
+    except Exception:
+      pass
 
 
 @router.callback_query(F.data == "exchange_rate")
@@ -1646,7 +1659,7 @@ async def view_order_details(callback: CallbackQuery, state: FSMContext):
 
 @router.message(Command("staff"))
 async def admin_panel_command(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     await message.answer("Недостаточно прав!")
     return
   await state.clear()
@@ -1655,7 +1668,7 @@ async def admin_panel_command(message: Message, state: FSMContext):
 
 async def show_admin_menu(event: Message | CallbackQuery, state: FSMContext):
   user_id = event.from_user.id
-  if user_id != int(ADMIN_ID):
+  if not is_admin(user_id):
     return
 
   conn = sqlite3.connect("usdt_exchange.db")
@@ -1758,15 +1771,14 @@ async def show_admin_menu(event: Message | CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "adm_menu")
 async def adm_menu_cb(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   await show_admin_menu(callback, state)
 
 
-# --- УПРАВЛЕНИЕ ФОТОГРАФИЯМИ ВСЕХ КАТЕГОРИЙ ---
 @router.callback_query(F.data == "adm_photos_menu")
 async def adm_photos_menu(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   builder = InlineKeyboardBuilder()
   builder.button(
@@ -1800,7 +1812,7 @@ async def adm_photos_menu(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data.startswith("adm_set_photo_"))
 async def adm_set_category_photo_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   photo_key = callback.data.replace("adm_set_photo_", "")
   await state.update_data(photo_key=photo_key)
@@ -1841,7 +1853,7 @@ async def adm_set_category_photo_start(callback: CallbackQuery, state: FSMContex
 
 @router.callback_query(F.data.startswith("adm_clear_photo_"))
 async def adm_clear_category_photo(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   photo_key = callback.data.replace("adm_clear_photo_", "")
   update_setting(photo_key, "")
@@ -1852,7 +1864,7 @@ async def adm_clear_category_photo(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_category_photo, F.photo)
 async def adm_save_category_photo(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   data = await state.get_data()
   photo_key = data.get("photo_key")
@@ -1871,7 +1883,7 @@ async def adm_save_category_photo(message: Message, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_category_photo)
 async def adm_wrong_category_photo(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   await message.answer(
       "Пожалуйста, отправьте именно **изображение (фото)** или нажмите кнопку"
@@ -1879,10 +1891,9 @@ async def adm_wrong_category_photo(message: Message, state: FSMContext):
   )
 
 
-# --- УПРАВЛЕНИЕ БАЛАНСОМ ПОЛЬЗОВАТЕЛЯ АДМИНИСТРАТОРОМ ---
 @router.callback_query(F.data == "adm_edit_balance_start")
 async def adm_edit_balance_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   builder = InlineKeyboardBuilder()
   builder.button(
@@ -1901,7 +1912,7 @@ async def adm_edit_balance_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_user_id_to_edit)
 async def adm_edit_balance_get_user(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     target_id = int(message.text.strip())
@@ -1948,7 +1959,7 @@ async def adm_edit_balance_get_user(message: Message, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_new_balance)
 async def adm_edit_balance_save(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     new_balance = float(message.text.strip().replace(",", "."))
@@ -1995,7 +2006,7 @@ async def adm_edit_balance_save(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_rates_menu")
 async def adm_rates_menu(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   builder = InlineKeyboardBuilder()
   builder.button(
@@ -2039,7 +2050,7 @@ async def adm_rates_menu(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "adm_pending_orders")
 async def adm_pending_orders(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Недостаточно прав!", show_alert=True)
     return
 
@@ -2098,7 +2109,7 @@ async def adm_pending_orders(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "adm_in_progress_orders")
 async def adm_in_progress_orders(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Недостаточно прав!", show_alert=True)
     return
 
@@ -2151,7 +2162,7 @@ async def adm_in_progress_orders(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "adm_completed_orders")
 async def adm_completed_orders(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Недостаточно прав!", show_alert=True)
     return
 
@@ -2191,7 +2202,7 @@ async def adm_completed_orders(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(F.data == "adm_broadcast")
 async def adm_broadcast_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   data = await state.get_data()
   await state.update_data(main_msg_id=data.get("main_msg_id"))
@@ -2212,7 +2223,7 @@ async def adm_broadcast_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_broadcast)
 async def adm_broadcast_process(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   text = message.text
   conn = sqlite3.connect("usdt_exchange.db")
@@ -2242,7 +2253,7 @@ async def adm_broadcast_process(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_set_rate_1")
 async def adm_set_rate_1_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   data = await state.get_data()
   await state.update_data(main_msg_id=data.get("main_msg_id"))
@@ -2263,7 +2274,7 @@ async def adm_set_rate_1_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_rate_1)
 async def adm_save_rate_1(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     val = float(message.text.strip().replace(",", "."))
@@ -2276,7 +2287,7 @@ async def adm_save_rate_1(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_set_rate_2")
 async def adm_set_rate_2_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   data = await state.get_data()
   await state.update_data(main_msg_id=data.get("main_msg_id"))
@@ -2297,7 +2308,7 @@ async def adm_set_rate_2_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_rate_2)
 async def adm_save_rate_2(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     val = float(message.text.strip().replace(",", "."))
@@ -2310,7 +2321,7 @@ async def adm_save_rate_2(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_set_rate_3")
 async def adm_set_rate_3_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   data = await state.get_data()
   await state.update_data(main_msg_id=data.get("main_msg_id"))
@@ -2331,7 +2342,7 @@ async def adm_set_rate_3_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_rate_3)
 async def adm_save_rate_3(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     val = float(message.text.strip().replace(",", "."))
@@ -2344,7 +2355,7 @@ async def adm_save_rate_3(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_set_limit_1")
 async def adm_set_limit_1_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   data = await state.get_data()
   await state.update_data(main_msg_id=data.get("main_msg_id"))
@@ -2365,7 +2376,7 @@ async def adm_set_limit_1_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_limit_1)
 async def adm_save_limit_1(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     val = float(message.text.strip().replace(",", "."))
@@ -2378,7 +2389,7 @@ async def adm_save_limit_1(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_set_limit_2")
 async def adm_set_limit_2_start(callback: CallbackQuery, state: FSMContext):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     return
   data = await state.get_data()
   await state.update_data(main_msg_id=data.get("main_msg_id"))
@@ -2399,7 +2410,7 @@ async def adm_set_limit_2_start(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminStates.waiting_for_limit_2)
 async def adm_save_limit_2(message: Message, state: FSMContext):
-  if message.from_user.id != int(ADMIN_ID):
+  if not is_admin(message.from_user.id):
     return
   try:
     val = float(message.text.strip().replace(",", "."))
@@ -2412,7 +2423,7 @@ async def adm_save_limit_2(message: Message, state: FSMContext):
 
 @router.callback_query(F.data == "adm_export_users")
 async def adm_export_users(callback: CallbackQuery):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Недостаточно прав!", show_alert=True)
     return
 
@@ -2448,7 +2459,7 @@ async def adm_export_users(callback: CallbackQuery):
 
 @router.callback_query(F.data == "adm_export_system_logs")
 async def adm_export_system_logs(callback: CallbackQuery):
-  if callback.from_user.id != int(ADMIN_ID):
+  if not is_admin(callback.from_user.id):
     await callback.answer("Недостаточно прав!", show_alert=True)
     return
 
