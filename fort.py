@@ -23,7 +23,7 @@ TOKEN = "8919102783:AAFlB5ICuD7WzONLHzeW5dspJKj17TT7UMg"
 
 # --- СПИСОК АДМИНИСТРАТОРОВ ---
 # Добавьте сюда Telegram ID всех администраторов через запятую
-ADMIN_IDS = [8075312868]  # Пример: [8075312868, 987654321]
+ADMIN_IDS = [8075312868, 8887644613]
 
 
 def is_admin(user_id: int) -> bool:
